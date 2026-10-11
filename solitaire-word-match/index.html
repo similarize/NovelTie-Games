@@ -15,7 +15,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png" />
 <link rel="manifest" href="assets/manifest.json?v=2" />
     <link rel="apple-touch-icon" href="assets/icon-180.png" />
-    <meta name="swm-build" content="20261009-stories1" />
+    <meta name="swm-build" content="20261010-famtag1" />
     <title>Solitaire Word Match</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -181,6 +181,16 @@
         position:absolute; right:3px; bottom:3px; z-index:30; background:rgba(0,0,0,.55); color:#fff;
         font-size:11px; font-weight:700; padding:1px 7px; border-radius:999px;
       }
+      .fslot .famTag{
+        position:absolute; left:1px; right:1px; top:1px; z-index:40; pointer-events:none;
+        display:flex; align-items:center; justify-content:center; gap:3px; min-height:22px;
+        padding:2px 4px; border-radius:7px; text-align:center; line-height:1.05;
+        background:linear-gradient(180deg,#ffe07a,#f0b93e); color:#5a3a00;
+        font-weight:800; font-size:12.5px; letter-spacing:.01em; overflow-wrap:anywhere;
+        box-shadow:0 2px 5px rgba(0,0,0,.4), inset 0 0 0 1px rgba(255,255,255,.55);
+      }
+      .fslot .famTag svg{ width:12px; height:12px; flex:none; }
+      .fslot .famTag.long{ font-size:10.5px; }
       .fslot .fcard{ transition:transform .15s ease; }
       .fslot .fcard.under{ filter:brightness(.93); }
       .fslot.done{ box-shadow:inset 0 2px 6px rgba(0,0,0,.45), 0 0 0 2px var(--gold), 0 0 14px rgba(240,185,62,.55); }
@@ -1891,6 +1901,12 @@
             c.style.zIndex = i + 1;
             slot.appendChild(c);
           });
+          // once the crown is covered, a big tag keeps the category readable
+          if(banked.length > 1){
+            const cw = (eff(st, banked[0]) || {}).word || F.label || "";
+            slot.insertAdjacentHTML("beforeend", '<span class="famTag' + (cw.length > 10 ? " long" : "") + '">' + svgIcon("crown") + "<span>" + cw + "</span></span>");
+            slot.setAttribute("aria-label", cw + " pile, " + banked.length + " of " + FAMTOTAL[fam] + " cards");
+          }
           if(done) slot.classList.add("done");
           slot.insertAdjacentHTML("beforeend", '<span class="prog">' + banked.length + "/" + FAMTOTAL[fam] + '</span>');
         }
@@ -2638,7 +2654,7 @@
   var btn = document.getElementById('installBtn');
   var deferred = null;
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js?v=20261009-stories1', { scope: './' }).catch(function(){});
+    navigator.serviceWorker.register('sw.js?v=20261010-famtag1', { scope: './' }).catch(function(){});
   }
   window.addEventListener('beforeinstallprompt', function(e){
     e.preventDefault();
