@@ -15,7 +15,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png" />
 <link rel="manifest" href="assets/manifest.json?v=2" />
     <link rel="apple-touch-icon" href="assets/icon-180.png" />
-    <meta name="swm-build" content="20261010-famtag1" />
+    <meta name="swm-build" content="20261011-tabs1" />
     <title>Solitaire Word Match</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -168,7 +168,7 @@
       }
       .recycleHint svg{ width:26px; height:26px; }
 
-      #foundRow{ display:grid; grid-template-columns:repeat(5,1fr); gap:6px; }
+      #foundRow{ display:grid; grid-template-columns:repeat(5,1fr); gap:6px; padding-top:14px; }
       .fslot{
         position:relative; height:var(--ch); border-radius:9px;
         background:linear-gradient(180deg,#0b5f2d,#07451f);
@@ -181,18 +181,25 @@
         position:absolute; right:3px; bottom:3px; z-index:30; background:rgba(0,0,0,.55); color:#fff;
         font-size:11px; font-weight:700; padding:1px 7px; border-radius:999px;
       }
+      /* folder tab: sticks up out of the top of a covered crown pile, never over the cards */
       .fslot .famTag{
-        position:absolute; left:1px; right:1px; top:1px; z-index:40; pointer-events:none;
-        display:flex; align-items:center; justify-content:center; gap:3px; min-height:22px;
-        padding:2px 4px; border-radius:7px; text-align:center; line-height:1.05;
-        background:linear-gradient(180deg,#ffe07a,#f0b93e); color:#5a3a00;
-        font-weight:800; font-size:12.5px; letter-spacing:.01em; overflow-wrap:anywhere;
-        box-shadow:0 2px 5px rgba(0,0,0,.4), inset 0 0 0 1px rgba(255,255,255,.55);
+        position:absolute; left:5px; bottom:100%; z-index:5; pointer-events:none;
+        max-width:calc(100% - 10px); box-sizing:border-box; height:14px; padding:0 6px;
+        display:flex; align-items:center; gap:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        border-radius:6px 6px 0 0; background:linear-gradient(180deg,#ffe58c,#f0b93e); color:#5a3a00;
+        font-weight:800; font-size:9.5px; line-height:14px; letter-spacing:.01em;
+        box-shadow:0 -1px 2px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.6);
       }
-      .fslot .famTag svg{ width:12px; height:12px; flex:none; }
-      .fslot .famTag.long{ font-size:10.5px; }
+      .fslot .famTag > span{ overflow:hidden; text-overflow:ellipsis; }
+      .fslot .famTag svg{ width:9px; height:9px; flex:none; }
+      /* a finished pile lifts off the board and fades away */
+      .fslot.leaving .fcard, .fslot.leaving .famTag, .fslot.leaving .prog{ animation:pileAway .8s cubic-bezier(.5,0,.75,0) forwards; }
+      @keyframes pileAway{ 0%{ transform:translateY(0) scale(1); opacity:1; } 25%{ transform:translateY(4px) scale(1.04); opacity:1; } 100%{ transform:translateY(-160%) scale(.55) rotate(-6deg); opacity:0; } }
+      .fslot.cleared{ background:linear-gradient(180deg,#0b5f2d,#07451f); }
+      .fslot .doneMark{ width:46%; color:rgba(255,217,104,.55); }
+      .fslot .doneName{ position:absolute; left:3px; right:3px; bottom:5px; text-align:center; font-size:9.5px; font-weight:700; color:rgba(255,230,160,.6); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
       .fslot .fcard{ transition:transform .15s ease; }
-      .fslot .fcard.under{ filter:brightness(.93); }
+      .fslot .fcard.under{ filter:brightness(.93); visibility:hidden; }
       .fslot.done{ box-shadow:inset 0 2px 6px rgba(0,0,0,.45), 0 0 0 2px var(--gold), 0 0 14px rgba(240,185,62,.55); }
       .fslot.dropOk, .col.dropOk .card.topCard, .card.dropOk{ box-shadow:0 0 0 3px #7dffb0, 0 0 16px rgba(125,255,176,.8) !important; }
       .fslot.dropBad{ box-shadow:0 0 0 3px #ff8d84 !important; }
@@ -441,7 +448,7 @@
       }
       #toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
       @media (prefers-reduced-motion: reduce){
-        .card.flipIn,.card.popIn,.winStars svg.on,.card.hintSrc,.card.hintDst,.movesRibbon.low b{ animation:none !important; }
+        .fslot.leaving .fcard,.fslot.leaving .famTag,.card.flipIn,.card.popIn,.winStars svg.on,.card.hintSrc,.card.hintDst,.movesRibbon.low b{ animation:none !important; }
       }
     </style>
   </head>
@@ -1888,6 +1895,15 @@
         } else {
           const F = FAM[fam], banked = st.banked[fam] || [];
           const done = banked.length >= FAMTOTAL[fam];
+          const crownWord = (eff(st, banked[0]) || {}).word || F.label || "";
+          if(done && !(G.leaving && G.leaving[fam])){
+            // finished and already flown off: leave a faint marker so the slot reads as done
+            slot.classList.add("cleared");
+            slot.setAttribute("aria-label", crownWord + " pile complete");
+            slot.innerHTML = '<span class="doneMark">' + svgIcon("crown", 1.4) + '</span><span class="doneName">' + crownWord + '</span>';
+            foundEl.appendChild(slot);
+            continue;
+          }
           slot.setAttribute("aria-label", "Top pile, " + banked.length + " of " + FAMTOTAL[fam] + " cards, showing " + (eff(st, banked[banked.length - 1]) || {}).word);
           // the newest card sits on top; up to two earlier ones peek out
           // above it so it reads as a pile. The tab names the category.
@@ -1903,11 +1919,18 @@
           });
           // once the crown is covered, a big tag keeps the category readable
           if(banked.length > 1){
-            const cw = (eff(st, banked[0]) || {}).word || F.label || "";
-            slot.insertAdjacentHTML("beforeend", '<span class="famTag' + (cw.length > 10 ? " long" : "") + '">' + svgIcon("crown") + "<span>" + cw + "</span></span>");
+            const cw = crownWord;
+            slot.insertAdjacentHTML("beforeend", '<span class="famTag">' + svgIcon("crown") + "<span>" + cw + "</span></span>");
             slot.setAttribute("aria-label", cw + " pile, " + banked.length + " of " + FAMTOTAL[fam] + " cards");
           }
-          if(done) slot.classList.add("done");
+          if(done){
+            slot.classList.add("done");
+            if(G.leaving[fam] === 1){
+              G.leaving[fam] = 2;
+              setTimeout(() => { const el = foundEl.children[s]; if(el) el.classList.add("leaving"); }, 1100);
+              setTimeout(() => { if(G && G.leaving){ delete G.leaving[fam]; render(); } }, 1950);
+            } else if(G.leaving[fam] === 2) slot.classList.add("leaving");
+          }
           slot.insertAdjacentHTML("beforeend", '<span class="prog">' + banked.length + "/" + FAMTOTAL[fam] + '</span>');
         }
         foundEl.appendChild(slot);
@@ -2051,7 +2074,7 @@
     function hideOverlays(){ document.querySelectorAll(".overlay").forEach(o => o.hidden = true); }
     function loadLevel(n){
       const gen = generateLevel(n);
-      G = { st: gen.st, cfg: gen.cfg, history: [], sel: null, hintPair: null, lastFlip: [], lastBank: null, over: false, started: false };
+      G = { st: gen.st, cfg: gen.cfg, history: [], sel: null, hintPair: null, lastFlip: [], lastBank: null, over: false, started: false, leaving: {} };
       // top up boosters a little each level
       S.boost.hint = Math.max(S.boost.hint, 2);
       S.boost.undo = Math.max(S.boost.undo, 4);
@@ -2071,7 +2094,7 @@
       REG = c.reg; FAMTOTAL = c.famtotal;
       S.level = c.level;
       G = { st: c.st, cfg: levelCfg(c.level), history: Array.isArray(c.history) ? c.history : [], sel: null, hintPair: null,
-            lastFlip: [], lastBank: null, over: false, started: true };
+            lastFlip: [], lastBank: null, over: false, started: true, leaving: {} };
       savedCurrent = null;
       hideOverlays();
       showScreen("game");
@@ -2142,6 +2165,8 @@
       if(mv.kind === "merge") gain += 5;
       const afterFams = Object.keys(FAMTOTAL).filter(f => (st.banked[f]||[]).length >= FAMTOTAL[f]);
       const newFams = afterFams.filter(f => beforeFams.indexOf(f) < 0);
+      if(!G.leaving) G.leaving = {};
+      newFams.forEach(f => { G.leaving[f] = 1; });
       newFams.forEach(f => { gain += 10; setTimeout(() => toast("Pile complete! +10 coins"), 60); });
       if(newFams.length && !isWin(st)) setTimeout(() => { if(G && !G.over) showStoryCard(newFams); }, 2500);
       if(gain > 0) S.coins += gain;
@@ -2654,7 +2679,7 @@
   var btn = document.getElementById('installBtn');
   var deferred = null;
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js?v=20261010-famtag1', { scope: './' }).catch(function(){});
+    navigator.serviceWorker.register('sw.js?v=20261011-tabs1', { scope: './' }).catch(function(){});
   }
   window.addEventListener('beforeinstallprompt', function(e){
     e.preventDefault();
