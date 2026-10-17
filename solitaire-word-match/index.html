@@ -15,7 +15,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png" />
 <link rel="manifest" href="assets/manifest.json?v=2" />
     <link rel="apple-touch-icon" href="assets/icon-180.png" />
-    <meta name="swm-build" content="20261016-juice1" />
+    <meta name="swm-build" content="20261016-art1" />
     <title>Solitaire Word Match</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -463,6 +463,13 @@
 .col .card:not(.down){transition:transform .12s ease, box-shadow .12s ease}
 @media (hover:hover){.col .card:not(.down):hover{transform:translateY(-3px);box-shadow:0 8px 16px rgba(0,0,0,.35),inset 0 0 0 1px var(--card-line)}}
 .shake{animation:shk .28s}@keyframes shk{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+/* art pass: felt + card faces, identical for every card (no per-category look) */
+body{background:radial-gradient(140% 100% at 50% 40%, rgba(0,0,0,0) 55%, rgba(0,0,0,.45) 100%), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E"), radial-gradient(120% 90% at 50% 0%, var(--felt) 0%, var(--felt-deep) 78%, var(--felt-edge) 100%), var(--felt-deep) !important; background-attachment:fixed}
+.card:not(.back):not(.keyCard){background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cfilter id='l'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.6 .25' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .42 0 0 0 0 .2 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23l)' opacity='.22'/%3E%3C/svg%3E"), radial-gradient(130% 90% at 50% 0%, #fffef8 0%, #fff6df 60%, #f3e3c0 100%) !important}
+.card:not(.back):not(.keyCard) .word{text-shadow:0 1px 0 rgba(255,255,255,.9)}
+.card:not(.back):not(.keyCard)::after{opacity:.35}
+.card:not(.back):not(.keyCard){outline:1.5px solid rgba(176,138,72,.35);outline-offset:-5px}
+.fslot{box-shadow:inset 0 2px 10px rgba(0,0,0,.35), inset 0 0 0 1.5px rgba(255,255,255,.08)}
 </style>
   </head>
   <body>
@@ -2471,7 +2478,7 @@
   var btn = document.getElementById('installBtn');
   var deferred = null;
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js?v=20261016-juice1', { scope: './' }).catch(function(){});
+    navigator.serviceWorker.register('sw.js?v=20261016-art1', { scope: './' }).catch(function(){});
   }
   window.addEventListener('beforeinstallprompt', function(e){
     e.preventDefault();
