@@ -118,11 +118,19 @@ function startRound(word, daily, track){
 function layerOpts(L){ return shuffle([{l:L.l,f:L.f,g:L.g,ok:true}].concat(L.x.map(function(x){return {l:x[0],f:x[1],g:x[2],ok:false};}))); }
 function stratumColor(i,n){ var t=n<=1?1:i/(n-1); var a=[150,112,62], b=[46,30,18]; var c=a.map(function(v,k){return Math.round(v+(b[k]-v)*t);}); return "rgb("+c.join(",")+")"; }
 function rootStrip(w,k){
-  var last = k===w.L.length-1, chain=['<span class="rs-n">'+esc(w.w)+' <i>English</i></span>'];
-  for(var i=0;i<(last?k:k+1);i++) chain.push('<span class="rs-n">'+esc(w.L[i].f)+' <i>'+esc(w.L[i].l)+'</i></span>');
-  if(last) chain.push('<span class="rs-n">Root: <span class="sc">'+esc(w.root.f)+'</span> <i>'+esc(w.root.l)+'</i> “'+esc(w.root.g)+'”</span>');
+  var nodes=[{f:w.w,l:"English"}], chain=[];
+  for(var i=0;i<=k;i++) nodes.push({f:w.L[i].f,l:w.L[i].l});
+  var last = k===w.L.length-1;
+  if(last){ if(w.root.f!==w.L[k].f) nodes.push({f:w.root.f,l:w.root.l,root:1}); else nodes[nodes.length-1].root=1; }
+  var rom=function(f){ return String(f).split(" ").pop().toLowerCase(); }, latin=function(f){ return !/[^\u0000-\u024F\u1E00-\u1EFF\u02B0-\u036F*₀-₉ʷʰ]/.test(f); };
+  nodes.forEach(function(n,i){
+    var same = i>0 && !n.root && latin(n.f) && rom(n.f)===rom(nodes[i-1].f);
+    chain.push('<span class="rs-n">'+(n.root?'Root: ':'')+(same?'':'<span class="sc">'+esc(n.f)+'</span> ')+'<i>'+esc(n.l)+(same?', same form':'')+'</i></span>');
+  });
+  var h=chain.join(' <b>←</b> ');
+  if(last) h+='<div class="rs-root">Root meaning: “'+esc(w.root.g)+'”'+'</div>';
   var q=encodeURIComponent(w.w);
-  return '<div class="rootstrip"><div class="rs-chain">'+chain.join(' <b>←</b> ')+'</div>'+
+  return '<div class="rootstrip"><div class="rs-chain">'+h+'</div>'+
     '<div class="rs-src">Check it in a dictionary: <a href="https://www.etymonline.com/word/'+q+'" target="_blank" rel="noopener noreferrer">Etymonline</a> · <a href="https://en.wiktionary.org/wiki/'+q+'#Etymology" target="_blank" rel="noopener noreferrer">Wiktionary</a></div></div>';
 }
 function renderRound(){
