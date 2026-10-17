@@ -111,6 +111,7 @@ function pickFree(track){
   var from = fresh.length?fresh:pool.filter(function(w){return !R||R.word.id!==w.id;});
   return from[Math.floor(Math.random()*from.length)];
 }
+var duoStart=1; function w0n(){ return R.word.L.length; }
 function startRound(word, daily, track){
   R = {word:word, daily:!!daily, track:track||"all", stage:"intro", layer:0, answered:false, picked:-1, results:[], opts:null, score:0, bonusSel:{}, bonusChecked:false, bonusPts:0, bonusHits:0};
   renderRound();
@@ -139,7 +140,8 @@ function renderRound(){
   var w=R.word, n=w.L.length, h="";
   var right = R.duo ? '<span class="pill">P1 '+R.duo.p[0]+' · P2 '+R.duo.p[1]+'</span>' : '<span class="pill">'+R.score+' pts</span>';
   h += topbar(R.duo?"Pass & Play":R.daily?"Daily Dig":TRACKS[R.track].name, right);
-  if(R.duo && R.stage==="dig") h += '<div class="duo-turn">Player '+(R.layer%2+1)+'’s turn: take the phone. Player '+(2-R.layer%2)+', say your guess out loud first!</div>';
+  if(R.duo && R.stage==="bonus" && !R.bonusChecked) h += '<div class="duo-turn">Bonus round: Player '+((R.duo.start+n)%2+1)+' picks the related words.</div>';
+  if(R.duo && R.stage==="dig") h += '<div class="duo-turn">Player '+(((R.duo.start+R.layer)%2+1))+'’s turn: take the phone. Player '+((2-(R.duo.start+R.layer)%2))+', say your guess out loud first!</div>';
   if(R.duo && R.stage!=="dig" && R.stage!=="intro") h += '<div class="duo-turn">Score: Player 1 <b>'+R.duo.p[0]+'</b> · Player 2 <b>'+R.duo.p[1]+'</b>'+(R.duo.p[0]===R.duo.p[1]?' · a tie!':' · Player '+(R.duo.p[0]>R.duo.p[1]?1:2)+' leads')+'</div>';
   if(R.stage==="intro"){
     h += '<div class="wordcard"><div class="tag">'+(R.daily?"Today's word":"Your word")+'</div><div class="w">'+esc(w.w)+' '+SB(w.w,"English")+'</div><div class="d">'+esc(w.def)+'</div></div><div class="sep"></div>';
@@ -252,6 +254,7 @@ function finishRound(){
   if(hits===n) R.score += 10;
   var trail = R.results.map(function(x){return x?"🟩":"🟥";}).join("")+" ⭐"+R.bonusHits+"/"+w.B.y.length;
   R.trail = trail;
+  if(R.duo){ R.stage="done"; renderRound(); window.scrollTo(0,0); return; } /* duo rounds never touch the solo save */
   var p = st.played[w.id]||{best:0,times:0}; p.best=Math.max(p.best,R.score); p.times++; st.played[w.id]=p;
   st.roots[w.root.k]=1; st.stats.digs++; st.stats.hits+=hits; st.stats.layers+=n;
   if(R.daily){
@@ -358,7 +361,7 @@ document.addEventListener("click", function(e){
   switch(a){
     case "home": if(screen==="home") return; try{ history.back(); }catch(_){ go("home",null,true); } setTimeout(function(){ if(screen!=="home") go("home",null,true); },60); break;
     case "close": closeModal(); break;
-    case "duo": closeModal(); var dw=pickFree("all"); screen="round"; try{ history.pushState({s:"round"},""); }catch(_){} startRound(dw,false,"all"); R.duo={p:[0,0]}; renderRound(); window.scrollTo(0,0); break;
+    case "duo": closeModal(); var dw=pickFree("all"); screen="round"; try{ history.pushState({s:"round"},""); }catch(_){} startRound(dw,false,"all"); duoStart=1-duoStart; R.duo={p:[0,0],start:duoStart}; renderRound(); window.scrollTo(0,0); break;
     case "daily": go("round",{word:dailyWord(denverDate()),daily:true}); break;
     case "free": closeModal(); var tr=d.track||"all"; var wd=pickFree(tr); screen="round"; try{ history.pushState({s:"round"},""); }catch(_){} startRound(wd,false,tr); window.scrollTo(0,0); break;
     case "replay": closeModal(); go("round",{word:byId(d.id),daily:false,track:"all"}); break;
@@ -368,7 +371,7 @@ document.addEventListener("click", function(e){
     case "dig": R.stage="dig"; renderRound(); break;
     case "pick":
       if(R.answered) return; var i=+d.i, ok=R.opts[i].ok; R.answered=true; R.picked=i; R.results.push(ok); R.justDug=true;
-      if(ok && R.duo) R.duo.p[R.layer%2]+=10;
+      if(ok && R.duo) R.duo.p[(R.duo.start+R.layer)%2]+=10;
       if(ok){ R.score+=10; buzz(25); } else buzz([40,60,40]);
       renderRound();
       var btn=document.querySelector('.opt[data-i="'+i+'"]'); if(btn){ if(ok) dust(btn); else btn.classList.add("shake"); }
@@ -390,7 +393,7 @@ document.addEventListener("click", function(e){
     case "chip": if(R.bonusChecked) return; R.bonusSel[+d.i]=!R.bonusSel[+d.i]; el.classList.toggle("sel"); break;
     case "checkbonus":
       var pts=0, hits=0; R.bonusList.forEach(function(b,i){ if(R.bonusSel[i]){ if(b.ok){pts+=5;hits++;} else pts-=2; } });
-      R.bonusPts=Math.max(0,pts); R.bonusHits=hits; R.score+=R.bonusPts; R.bonusChecked=true; if(hits) buzz(25); renderRound(); break;
+      R.bonusPts=Math.max(0,pts); R.bonusHits=hits; R.score+=R.bonusPts; if(R.duo) R.duo.p[(R.duo.start+w0n())%2]+=R.bonusPts; R.bonusChecked=true; if(hits) buzz(25); renderRound(); break;
     case "finish": finishRound(); break;
     case "sharedaily": shareDaily(); break;
     case "trial": startTrial(d.g); window.scrollTo(0,0); break;
