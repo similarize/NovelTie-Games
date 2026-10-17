@@ -111,7 +111,8 @@ function pickFree(track){
   var from = fresh.length?fresh:pool.filter(function(w){return !R||R.word.id!==w.id;});
   return from[Math.floor(Math.random()*from.length)];
 }
-var duoStart=1; function w0n(){ return R.word.L.length; }
+var duoStart=1;
+function ACT_duo(){ var keep = (R && R.duo) ? R.duo.p.slice() : [0,0]; closeModal(); var dw=pickFree("all"); screen="round"; try{ history.pushState({s:"round"},""); }catch(_){} startRound(dw,false,"all"); duoStart=1-duoStart; R.duo={p:keep,start:duoStart}; renderRound(); window.scrollTo(0,0); } function w0n(){ return R.word.L.length; }
 function startRound(word, daily, track){
   R = {word:word, daily:!!daily, track:track||"all", stage:"intro", layer:0, answered:false, picked:-1, results:[], opts:null, score:0, bonusSel:{}, bonusChecked:false, bonusPts:0, bonusHits:0};
   renderRound();
@@ -196,6 +197,7 @@ function renderRound(){
     else h += '<button class="btn primary" data-act="free" data-track="'+R.track+'">Next word →</button>';
     h += '<div class="sep"></div><div class="row"><button class="btn" data-act="codex">📜 Codex</button><button class="btn" data-act="home">Home</button></div></div><div id="wb-helper"></div>';
   }
+  if(R.duo && R.stage==="done"){ h = h.replace(/Keep digging \(Free Play\) →|Next word →/g, "👥 Next Pass &amp; Play word →"); }
   app.innerHTML = h;
   if(R.stage==="done" && window.RootlineBank) window.RootlineBank.helperCard(w);
 }
@@ -361,9 +363,9 @@ document.addEventListener("click", function(e){
   switch(a){
     case "home": if(screen==="home") return; try{ history.back(); }catch(_){ go("home",null,true); } setTimeout(function(){ if(screen!=="home") go("home",null,true); },60); break;
     case "close": closeModal(); break;
-    case "duo": closeModal(); var dw=pickFree("all"); screen="round"; try{ history.pushState({s:"round"},""); }catch(_){} startRound(dw,false,"all"); duoStart=1-duoStart; R.duo={p:[0,0],start:duoStart}; renderRound(); window.scrollTo(0,0); break;
+    case "duo": R=null; ACT_duo(); break;
     case "daily": go("round",{word:dailyWord(denverDate()),daily:true}); break;
-    case "free": closeModal(); var tr=d.track||"all"; var wd=pickFree(tr); screen="round"; try{ history.pushState({s:"round"},""); }catch(_){} startRound(wd,false,tr); window.scrollTo(0,0); break;
+    case "free": if(R && R.duo && R.stage==="done"){ ACT_duo(); break; } closeModal(); var tr=d.track||"all"; var wd=pickFree(tr); screen="round"; try{ history.pushState({s:"round"},""); }catch(_){} startRound(wd,false,tr); window.scrollTo(0,0); break;
     case "replay": closeModal(); go("round",{word:byId(d.id),daily:false,track:"all"}); break;
     case "gates": go("gates"); break;
     case "codex": go("codex"); break;
