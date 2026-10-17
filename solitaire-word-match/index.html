@@ -15,7 +15,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png" />
 <link rel="manifest" href="assets/manifest.json?v=2" />
     <link rel="apple-touch-icon" href="assets/icon-180.png" />
-    <meta name="swm-build" content="20261015-r3" />
+    <meta name="swm-build" content="20261016-duo1" />
     <title>Solitaire Word Match</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -452,7 +452,11 @@
       @media (prefers-reduced-motion: reduce){
         .fslot.leaving .fcard,.fslot.leaving .famTag,.card.flipIn,.card.popIn,.winStars svg.on,.card.hintSrc,.card.hintDst,.movesRibbon.low b{ animation:none !important; }
       }
-    </style>
+    .duoBtn{border:0;border-radius:999px;padding:6px 10px;margin-right:6px;font:600 13px system-ui;background:rgba(255,255,255,.18);color:inherit;cursor:pointer}
+.duoBtn.on{background:#fff;color:#333}
+.duoPill{font:600 12px system-ui;padding:5px 10px;border-radius:999px;color:#fff;background:rgba(0,0,0,.4);margin-right:6px;white-space:nowrap}
+.duoWin{margin-top:8px;font-weight:700}
+</style>
   </head>
   <body>
     <div id="app">
@@ -487,6 +491,8 @@
           </button>
           <div class="hudLvl" id="hudLvl">Level 1<small>Easy</small></div>
           <div class="hudSpacer"></div>
+          <button class="duoBtn" id="duoBtn" aria-pressed="false" title="Two players take turns">👥 2P</button>
+          <div class="duoPill" id="duoPill" hidden></div>
           <div class="coinPill" id="gameCoins"></div>
         </div>
         <div class="midRow">
@@ -1908,6 +1914,7 @@
         setTimeout(() => toast(left ? "Pile complete! +10 coins · slot free for a new crown" : "Pile complete! +10 coins"), 60); });
       if(newFams.length && !isWin(st)) setTimeout(() => { if(G && !G.over) showStoryCard(newFams); }, 2500);
       if(gain > 0) S.coins += gain;
+      duoAfterMove(gain);
       // feedback
       if(mv.kind === "bank" || mv.kind === "bankPile" || mv.kind === "crownLift"){
         buzz(14);
@@ -1934,6 +1941,26 @@
       }
       saveNow();
     }
+    /* ===== two-player turns (separate key; never touches the progress save) ===== */
+    const DUO = { on: localStorage.getItem("noveltie.swm.duo") === "1", turn: 0, pts: [0,0] };
+    function duoRender(){
+      const b = document.getElementById("duoBtn"), p = document.getElementById("duoPill"); if(!b) return;
+      b.setAttribute("aria-pressed", DUO.on ? "true" : "false"); b.classList.toggle("on", DUO.on);
+      p.hidden = !DUO.on;
+      if(DUO.on) p.innerHTML = '<b>P' + (DUO.turn+1) + '’s turn</b> · P1 ' + DUO.pts[0] + ' · P2 ' + DUO.pts[1];
+    }
+    function duoAfterMove(gain){
+      if(!DUO.on) return;
+      DUO.pts[DUO.turn] += Math.max(1, gain);
+      DUO.turn = 1 - DUO.turn; duoRender();
+    }
+    document.addEventListener("click", e => {
+      if(!e.target.closest || !e.target.closest("#duoBtn")) return;
+      DUO.on = !DUO.on; DUO.turn = 0; DUO.pts = [0,0];
+      localStorage.setItem("noveltie.swm.duo", DUO.on ? "1" : "0");
+      toast(DUO.on ? "Two players: pass the phone after every move" : "Solo play"); duoRender();
+    });
+    setTimeout(duoRender, 0);
     function onWin(){
       G.over = true;
       const st = G.st;
@@ -1952,6 +1979,7 @@
       $("#winReward").innerHTML = 'You earned <span class="coinPill">' + svgIcon("coin", 1.6) + reward + "</span>";
       $("#nextBtn").textContent = (G.cfg.n === CLASSIC_LEVELS || G.cfg.n >= TOTAL_LEVELS) ? "Finish" : "Next Level";
       renderCoins();
+      if(DUO.on){ $("#winReward").innerHTML += '<div class="duoWin">Team win! Player 1: ' + DUO.pts[0] + ' · Player 2: ' + DUO.pts[1] + '</div>'; DUO.pts = [0,0]; DUO.turn = 0; duoRender(); }
       hideStory(); winStory();
       setTimeout(() => { $("#winOverlay").hidden = false; }, 550);
     }
@@ -2418,7 +2446,7 @@
   var btn = document.getElementById('installBtn');
   var deferred = null;
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js?v=20261015-r3', { scope: './' }).catch(function(){});
+    navigator.serviceWorker.register('sw.js?v=20261016-duo1', { scope: './' }).catch(function(){});
   }
   window.addEventListener('beforeinstallprompt', function(e){
     e.preventDefault();
