@@ -1,6 +1,6 @@
 /* Rootline service worker: caches the game so it works offline after the first load.
    Stale-while-revalidate for same-origin files. */
-var CACHE = 'rootline-v13';
+var CACHE = 'rootline-v14';
 var FILES = ['./', 'index.html', 'style.css', 'data.js', 'scripts.js', 'app.js', 'word-stories.js', 'say-data.js', 'say.js', 'bank-config.js', 'bank.js', 'bank-seed.json',
   'assets/icon-192.png', 'assets/icon-512.png', 'assets/icon-180.png'];
 self.addEventListener('install', function (e) {

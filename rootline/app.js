@@ -98,7 +98,7 @@ function renderHome(){
   h += '</div><div style="display:grid;gap:14px"><div class="card"><h3>Free Play</h3><div class="tracks">';
   for(var t in TRACKS){ var cnt = t==="all"?W.length:W.filter(function(w){return w.track===t;}).length;
     h += '<button class="track" data-act="free" data-track="'+t+'"><b>'+TRACKS[t].name+'</b><span>'+TRACKS[t].desc+' · '+cnt+'</span></button>'; }
-  h += '</div></div>'+(window.RootlineBank?window.RootlineBank.homeCard():"")+'<div class="row"><button class="btn" data-act="gates">🔤 Script Gates</button><button class="btn" data-act="codex">📜 Root Codex</button></div></div></div>';
+  h += '</div></div>'+(window.RootlineBank?window.RootlineBank.homeCard():"")+'<div class="row"><button class="btn" data-act="duo">👥 Pass &amp; Play (2 players)</button><button class="btn" data-act="gates">🔤 Script Gates</button><button class="btn" data-act="codex">📜 Root Codex</button></div></div></div>';
   h += '<p class="dim small" style="text-align:center;margin-top:26px">Progress saves on this device. Works offline once loaded. <a href="#" data-act="audiocredits" style="color:var(--gold)">🎧 Audio credits</a><br><a href="https://arcade.noveltie.com/" style="color:var(--gold)">← NovelTie Arcade</a></p>';
   app.innerHTML = h;
 }
@@ -137,8 +137,10 @@ function rootStrip(w,k){
 }
 function renderRound(){
   var w=R.word, n=w.L.length, h="";
-  var right = '<span class="pill">'+R.score+' pts</span>';
-  h += topbar(R.daily?"Daily Dig":TRACKS[R.track].name, right);
+  var right = R.duo ? '<span class="pill">P1 '+R.duo.p[0]+' · P2 '+R.duo.p[1]+'</span>' : '<span class="pill">'+R.score+' pts</span>';
+  h += topbar(R.duo?"Pass & Play":R.daily?"Daily Dig":TRACKS[R.track].name, right);
+  if(R.duo && R.stage==="dig") h += '<div class="duo-turn">Player '+(R.layer%2+1)+'’s turn: take the phone. Player '+(2-R.layer%2)+', say your guess out loud first!</div>';
+  if(R.duo && R.stage!=="dig" && R.stage!=="intro") h += '<div class="duo-turn">Score: Player 1 <b>'+R.duo.p[0]+'</b> · Player 2 <b>'+R.duo.p[1]+'</b>'+(R.duo.p[0]===R.duo.p[1]?' · a tie!':' · Player '+(R.duo.p[0]>R.duo.p[1]?1:2)+' leads')+'</div>';
   if(R.stage==="intro"){
     h += '<div class="wordcard"><div class="tag">'+(R.daily?"Today's word":"Your word")+'</div><div class="w">'+esc(w.w)+' '+SB(w.w,"English")+'</div><div class="d">'+esc(w.def)+'</div></div><div class="sep"></div>';
     h += '<div class="card"><p style="margin-top:0">This word has <b>'+n+'</b> older layers beneath it. Guess each ancestor, one layer at a time.</p><button class="btn primary" data-act="dig">⛏ Start digging</button></div>';
@@ -155,7 +157,7 @@ function renderRound(){
     h += '</div>';
     if(R.answered){
       var good = R.results[R.layer];
-      h += '<div class="feedback '+(good?"good":"bad")+'"><b>'+(good?"Struck it! +10":"Not quite. The answer: "+esc(L.l)+" "+esc(L.f))+'</b><br>'+(L.glyph?GLYPH[L.glyph]:"")+esc(L.why)+rootStrip(w,R.layer)+'</div><div class="sep"></div>';
+      h += '<div class="feedback '+(good?"good":"bad")+'"><b>'+(good?"Struck it! +10":"Not quite. The answer: "+esc(L.l)+" "+esc(L.f))+'</b><br>'+(L.glyph?GLYPH[L.glyph]:"")+esc(L.why)+rootStrip(w,R.layer)+(R.duo?'<div class="duo-talk">🗣 Talk it over: tap 🔊, then each try saying <b class="sc">'+esc(L.f)+'</b>. Whose version sounds closer?</div>':'')+'</div><div class="sep"></div>';
       h += R.layer<n-1 ? '<button class="btn primary" data-act="next">⛏ Dig deeper</button>' : '<button class="btn primary" data-act="tocousins">🪨 Bedrock! Meet the cousins →</button>';
     }
     h += '</div></div>';
@@ -356,6 +358,7 @@ document.addEventListener("click", function(e){
   switch(a){
     case "home": if(screen==="home") return; try{ history.back(); }catch(_){ go("home",null,true); } setTimeout(function(){ if(screen!=="home") go("home",null,true); },60); break;
     case "close": closeModal(); break;
+    case "duo": closeModal(); var dw=pickFree("all"); screen="round"; try{ history.pushState({s:"round"},""); }catch(_){} startRound(dw,false,"all"); R.duo={p:[0,0]}; renderRound(); window.scrollTo(0,0); break;
     case "daily": go("round",{word:dailyWord(denverDate()),daily:true}); break;
     case "free": closeModal(); var tr=d.track||"all"; var wd=pickFree(tr); screen="round"; try{ history.pushState({s:"round"},""); }catch(_){} startRound(wd,false,tr); window.scrollTo(0,0); break;
     case "replay": closeModal(); go("round",{word:byId(d.id),daily:false,track:"all"}); break;
@@ -365,6 +368,7 @@ document.addEventListener("click", function(e){
     case "dig": R.stage="dig"; renderRound(); break;
     case "pick":
       if(R.answered) return; var i=+d.i, ok=R.opts[i].ok; R.answered=true; R.picked=i; R.results.push(ok); R.justDug=true;
+      if(ok && R.duo) R.duo.p[R.layer%2]+=10;
       if(ok){ R.score+=10; buzz(25); } else buzz([40,60,40]);
       renderRound();
       var btn=document.querySelector('.opt[data-i="'+i+'"]'); if(btn){ if(ok) dust(btn); else btn.classList.add("shake"); }

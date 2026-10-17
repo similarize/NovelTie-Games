@@ -215,3 +215,5 @@ h3{font-family:var(--serif);color:var(--gold2);margin:4px 0 10px;font-weight:600
 .rootstrip{margin-top:10px;padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.18);font-size:.88em;line-height:1.5}
 .rootstrip .rs-n i{opacity:.7;font-size:.85em}.rootstrip .rs-chain b{color:var(--gold2)}
 .rootstrip .rs-root .sc{color:var(--gold2)}.rootstrip a{color:inherit;text-decoration:underline}
+.duo-turn{margin:0 0 10px;padding:8px 12px;border-radius:10px;background:rgba(214,170,90,.16);border:1px solid rgba(214,170,90,.4);font-size:.92em}
+.duo-talk{margin-top:8px;font-size:.9em;opacity:.95}
