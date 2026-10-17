@@ -122,7 +122,7 @@ function rootStrip(w,k){
   for(var i=0;i<=k;i++) nodes.push({f:w.L[i].f,l:w.L[i].l});
   var last = k===w.L.length-1;
   var base=function(f){ return String(f).replace(/\s*\([^)]*\)/g,'').trim(); };
-  if(last){ if(base(w.root.f)!==base(w.L[k].f)) nodes.push({f:w.root.f,l:w.root.l,root:1}); else nodes[nodes.length-1].root=1; }
+  if(last){ if(base(w.root.f)!==base(w.L[k].f) && base(w.root.f)!==String(base(w.L[k].f)).split(' ').pop()) nodes.push({f:w.root.f,l:w.root.l,root:1}); else nodes[nodes.length-1].root=1; }
   var rom=function(f){ return String(f).split(" ").pop().toLowerCase(); }, latin=function(f){ return !/[^\u0000-\u024F\u1E00-\u1EFF\u02B0-\u036F*₀-₉ʷʰ]/.test(f); };
   nodes.forEach(function(n,i){
     var same = i>0 && !n.root && latin(n.f) && rom(n.f)===rom(nodes[i-1].f);
