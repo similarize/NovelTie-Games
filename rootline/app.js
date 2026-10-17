@@ -117,6 +117,14 @@ function startRound(word, daily, track){
 }
 function layerOpts(L){ return shuffle([{l:L.l,f:L.f,g:L.g,ok:true}].concat(L.x.map(function(x){return {l:x[0],f:x[1],g:x[2],ok:false};}))); }
 function stratumColor(i,n){ var t=n<=1?1:i/(n-1); var a=[150,112,62], b=[46,30,18]; var c=a.map(function(v,k){return Math.round(v+(b[k]-v)*t);}); return "rgb("+c.join(",")+")"; }
+function rootStrip(w,k){
+  var chain=['<span class="rs-n">'+esc(w.w)+' <i>English</i></span>'];
+  for(var i=0;i<=k;i++) chain.push('<span class="rs-n">'+esc(w.L[i].f)+' <i>'+esc(w.L[i].l)+'</i></span>');
+  var q=encodeURIComponent(w.w);
+  return '<div class="rootstrip"><div class="rs-chain">'+chain.join(' <b>←</b> ')+'</div>'+
+    '<div class="rs-root">Root: <span class="sc">'+esc(w.root.f)+'</span> · '+esc(w.root.l)+' “'+esc(w.root.g)+'”</div>'+
+    '<div class="rs-src">Check it in a dictionary: <a href="https://www.etymonline.com/word/'+q+'" target="_blank" rel="noopener">Etymonline</a> · <a href="https://en.wiktionary.org/wiki/'+q+'#Etymology" target="_blank" rel="noopener">Wiktionary</a></div></div>';
+}
 function renderRound(){
   var w=R.word, n=w.L.length, h="";
   var right = '<span class="pill">'+R.score+' pts</span>';
@@ -137,7 +145,7 @@ function renderRound(){
     h += '</div>';
     if(R.answered){
       var good = R.results[R.layer];
-      h += '<div class="feedback '+(good?"good":"bad")+'"><b>'+(good?"Struck it! +10":"Not quite. The answer: "+esc(L.l)+" "+esc(L.f))+'</b><br>'+(L.glyph?GLYPH[L.glyph]:"")+esc(L.why)+'</div><div class="sep"></div>';
+      h += '<div class="feedback '+(good?"good":"bad")+'"><b>'+(good?"Struck it! +10":"Not quite. The answer: "+esc(L.l)+" "+esc(L.f))+'</b><br>'+(L.glyph?GLYPH[L.glyph]:"")+esc(L.why)+rootStrip(w,R.layer)+'</div><div class="sep"></div>';
       h += R.layer<n-1 ? '<button class="btn primary" data-act="next">⛏ Dig deeper</button>' : '<button class="btn primary" data-act="tocousins">🪨 Bedrock! Meet the cousins →</button>';
     }
     h += '</div></div>';
