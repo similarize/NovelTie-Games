@@ -278,7 +278,7 @@
 
   /* ---------- Trivia ---------- */
   function triviaIntro() {
-    app.innerHTML = topbar("Trivia Sprint") + '<div class="card center stack"><div>' + IC.timer + '</div><h3>60 seconds</h3><p class="muted">Answer as many questions as you can about people, places, scriptures, and Church history. Each answer shows its scripture or source.</p><p class="pill" style="display:inline-block">Best: ' + (st.best.trivia || 0) + '</p><button class="btn primary" data-act="tvgo">Begin</button></div>';
+    app.innerHTML = topbar("Trivia Sprint") + '<div class="card center stack"><div>' + IC.timer + '</div><h3>60 seconds</h3><p class="muted">Answer as many questions as you can about people, places, scriptures, and Church history. Each answer shows its scripture or source.</p><p class="pill" style="display:inline-block">Best: ' + (st.best.trivia || 0) + '</p><button class="btn primary" data-act="tvgo">Begin</button><button class="btn" data-act="duogo">👥 Family Duel (2 players)</button><p class="small muted">Take turns on one phone: 10 questions, no timer, a source after each.</p></div>';
   }
   var TV = null;
   ACT.tvgo = function () {
@@ -315,6 +315,33 @@
       (missed ? '<div class="card" style="margin-top:14px"><h3>Learn from these</h3>' + missed + "</div>" : "") +
       '<div class="stack" style="margin-top:16px"><button class="btn primary" data-act="tvgo">Play again</button><button class="btn" data-act="home">Home</button></div>';
   }
+  /* ---------- Family Duel: 2 players, one phone ---------- */
+  var DU = null;
+  ACT.duogo = function () {
+    if (cleanup) { cleanup(); cleanup = null; }
+    DU = { deck: shuffle(D.trivia.map(function (_, i) { return i; })).slice(0, 10), k: 0, p: [0, 0] }; duQ();
+  };
+  function duQ() {
+    var t = D.trivia[DU.deck[DU.k]], who = DU.k % 2;
+    DU.cur = { t: t, opts: shuffle([t.a].concat(t.w)), done: false };
+    app.innerHTML = topbar("Family Duel", '<span class="pill" id="dupill">P1 ' + DU.p[0] + ' · P2 ' + DU.p[1] + '</span>') +
+      '<div class="pill" style="display:inline-block;margin-bottom:10px">Question ' + (DU.k + 1) + ' of 10 · <b>Player ' + (who + 1) + '</b> answers</div>' +
+      '<p class="small muted">Player ' + (2 - who) + ': guess out loud which answer Player ' + (who + 1) + ' will pick!</p>' +
+      '<div class="card"><span class="chip">' + esc(t.c) + '</span><div class="bigq" style="margin-top:10px">' + esc(t.q) + "</div></div>" +
+      '<div class="opts" style="margin-top:12px">' + DU.cur.opts.map(function (o, n) { return '<button class="opt" data-act="dupick" data-arg="' + n + '">' + esc(o) + "</button>"; }).join("") + '</div><div id="dunext" style="margin-top:14px"></div>';
+  }
+  ACT.dupick = function (i) {
+    if (!DU || DU.cur.done) return; DU.cur.done = true;
+    var c = DU.cur, ok = c.opts[+i] === c.t.a; if (ok) DU.p[DU.k % 2]++; var dp = document.getElementById("dupill"); if (dp) dp.textContent = "P1 " + DU.p[0] + " · P2 " + DU.p[1];
+    app.querySelectorAll(".opt").forEach(function (x, n) { x.disabled = true; if (c.opts[n] === c.t.a) x.classList.add("ok"); else if (n === +i) x.classList.add("bad"); });
+    document.getElementById("dunext").innerHTML = '<p class="center">' + (ok ? "✓ Correct!" : "The answer is <b>" + esc(c.t.a) + "</b>.") + ' <a href="' + esc(c.t.url) + '" target="_blank" rel="noopener noreferrer">' + esc(c.t.ref) + ' ↗</a></p><button class="btn primary" data-act="dunext">' + (DU.k < 9 ? "Pass the phone →" : "See who won") + '</button>';
+  };
+  ACT.dunext = function () {
+    if (!DU) return; if (DU.k < 9) { DU.k++; duQ(); return; }
+    var a = DU.p[0], b = DU.p[1];
+    app.innerHTML = topbar("Family Duel") + '<div class="card center stack"><div class="serif" style="font-size:40px;color:var(--gold2)">' + a + ' – ' + b + '</div><div class="muted">' + (a === b ? "A tie! Great teamwork." : "Player " + (a > b ? 1 : 2) + " wins!") + '</div><p class="small muted">Talk about it: which question surprised you most?</p></div>' +
+      '<div class="stack" style="margin-top:16px"><button class="btn primary" data-act="duogo">Play again</button><button class="btn" data-act="home">Home</button></div>';
+  };
   var T1 = null;
   function triviaOne(i, daily) {
     var t = D.trivia[i], opts = shuffle([t.a].concat(t.w), rng(hashStr(t.q)));
