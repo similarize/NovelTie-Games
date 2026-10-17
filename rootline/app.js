@@ -118,12 +118,12 @@ function startRound(word, daily, track){
 function layerOpts(L){ return shuffle([{l:L.l,f:L.f,g:L.g,ok:true}].concat(L.x.map(function(x){return {l:x[0],f:x[1],g:x[2],ok:false};}))); }
 function stratumColor(i,n){ var t=n<=1?1:i/(n-1); var a=[150,112,62], b=[46,30,18]; var c=a.map(function(v,k){return Math.round(v+(b[k]-v)*t);}); return "rgb("+c.join(",")+")"; }
 function rootStrip(w,k){
-  var chain=['<span class="rs-n">'+esc(w.w)+' <i>English</i></span>'];
-  for(var i=0;i<=k;i++) chain.push('<span class="rs-n">'+esc(w.L[i].f)+' <i>'+esc(w.L[i].l)+'</i></span>');
+  var last = k===w.L.length-1, chain=['<span class="rs-n">'+esc(w.w)+' <i>English</i></span>'];
+  for(var i=0;i<(last?k:k+1);i++) chain.push('<span class="rs-n">'+esc(w.L[i].f)+' <i>'+esc(w.L[i].l)+'</i></span>');
+  if(last) chain.push('<span class="rs-n">Root: <span class="sc">'+esc(w.root.f)+'</span> <i>'+esc(w.root.l)+'</i> “'+esc(w.root.g)+'”</span>');
   var q=encodeURIComponent(w.w);
   return '<div class="rootstrip"><div class="rs-chain">'+chain.join(' <b>←</b> ')+'</div>'+
-    '<div class="rs-root">Root: <span class="sc">'+esc(w.root.f)+'</span> · '+esc(w.root.l)+' “'+esc(w.root.g)+'”</div>'+
-    '<div class="rs-src">Check it in a dictionary: <a href="https://www.etymonline.com/word/'+q+'" target="_blank" rel="noopener">Etymonline</a> · <a href="https://en.wiktionary.org/wiki/'+q+'#Etymology" target="_blank" rel="noopener">Wiktionary</a></div></div>';
+    '<div class="rs-src">Check it in a dictionary: <a href="https://www.etymonline.com/word/'+q+'" target="_blank" rel="noopener noreferrer">Etymonline</a> · <a href="https://en.wiktionary.org/wiki/'+q+'#Etymology" target="_blank" rel="noopener noreferrer">Wiktionary</a></div></div>';
 }
 function renderRound(){
   var w=R.word, n=w.L.length, h="";
