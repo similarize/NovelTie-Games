@@ -84,7 +84,9 @@
   }
   var SAVEABLE = {};
   ACT.jsave = function (arg, b) { var e = SAVEABLE[arg]; if (!e) return; var on = toggleJournal(e); b.classList.toggle("saved", on); b.innerHTML = on ? "★ Saved" : "☆ Save"; };
-  function saveBtn(entry) { var k = jKey(entry.text); SAVEABLE[k] = entry; var on = inJournal(entry.text); return '<button class="linkbtn' + (on ? " saved" : "") + '" data-act="jsave" data-arg="' + k + '">' + (on ? "★ Saved" : "☆ Save") + "</button>"; }
+  function speakBtn(k) { return ("speechSynthesis" in window) ? '<button class="linkbtn" data-act="jsay" data-arg="' + k + '" aria-label="Read aloud">🔊 Listen</button> ' : ""; }
+  document.addEventListener("click", function (e) { var b = e.target.closest && e.target.closest('[data-act="jsay"]'); if (!b) return; var en = SAVEABLE[b.getAttribute("data-arg")]; if (!en) return; speechSynthesis.cancel(); var u = new SpeechSynthesisUtterance(String(en.text).replace(/<[^>]+>/g, "")); u.rate = 0.92; u.lang = "en-US"; speechSynthesis.speak(u); }, true);
+  function saveBtn(entry) { var k = jKey(entry.text); SAVEABLE[k] = entry; var on = inJournal(entry.text); return speakBtn(k) + '<button class="linkbtn' + (on ? " saved" : "") + '" data-act="jsave" data-arg="' + k + '">' + (on ? "★ Saved" : "☆ Save") + "</button>"; }
   function srcHTML(s) {
     var cite, quote = s.text;
     if (s.kind === "scripture") cite = s.ref;
