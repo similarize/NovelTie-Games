@@ -15,7 +15,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png" />
 <link rel="manifest" href="assets/manifest.json?v=2" />
     <link rel="apple-touch-icon" href="assets/icon-180.png" />
-    <meta name="swm-build" content="20261016-duo1" />
+    <meta name="swm-build" content="20261016-juice1" />
     <title>Solitaire Word Match</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -456,6 +456,13 @@
 .duoBtn.on{background:#fff;color:#333}
 .duoPill{font:600 12px system-ui;padding:5px 10px;border-radius:999px;color:#fff;background:rgba(0,0,0,.4);margin-right:6px;white-space:nowrap}
 .duoWin{margin-top:8px;font-weight:700}
+.fx{position:fixed;left:0;top:0;width:9px;height:9px;border-radius:50%;pointer-events:none;z-index:9999;background:radial-gradient(circle,#fff6c9,#ffd23f 60%,rgba(255,200,40,0));will-change:transform,opacity}
+.fx.cf{border-radius:2px;width:8px;height:12px}
+.fxRing{position:fixed;pointer-events:none;z-index:9998;border:3px solid rgba(255,230,140,.9);border-radius:16px;animation:fxRing .5s ease-out forwards}
+@keyframes fxRing{from{transform:scale(.85);opacity:1}to{transform:scale(1.25);opacity:0}}
+.col .card:not(.down){transition:transform .12s ease, box-shadow .12s ease}
+@media (hover:hover){.col .card:not(.down):hover{transform:translateY(-3px);box-shadow:0 8px 16px rgba(0,0,0,.35),inset 0 0 0 1px var(--card-line)}}
+.shake{animation:shk .28s}@keyframes shk{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
 </style>
   </head>
   <body>
@@ -1925,6 +1932,7 @@
         if(start === 0){ sfx.crown(slot); lag = 140; }
         for(let i = (start === 0 ? 1 : 0); i < Math.min(added, 5); i++) setTimeout(() => sfx.bank(slot, start + i), lag + i * 70);
         if(justDone) setTimeout(() => sfx.complete(slot), 180);
+        fxSlot(slot, justDone ? 26 : 10);
       }
       else if(mv.kind === "unlock"){ buzz([16,40,16]); sfx.unlock(); }
       else if(mv.kind === "merge"){ buzz([12,30,20]); sfx.merge(); }
@@ -1961,6 +1969,22 @@
       toast(DUO.on ? "Two players: pass the phone after every move" : "Solo play"); duoRender();
     });
     setTimeout(duoRender, 0);
+    /* ===== juice: same gold sparkle for every card, never hints at a group ===== */
+    function fxBurst(el, n, confetti){
+      if(!el || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const b = el.getBoundingClientRect(), cx = b.left + b.width/2, cy = b.top + b.height/2;
+      if(!confetti){ const ring = document.createElement("div"); ring.className = "fxRing"; Object.assign(ring.style,{left:b.left+"px",top:b.top+"px",width:b.width+"px",height:b.height+"px"}); document.body.appendChild(ring); setTimeout(()=>ring.remove(), 520); }
+      const PAL = ["#ff5d73","#ffd23f","#3ec1d3","#7bd389","#b28dff","#ff9f43"];
+      for(let i=0;i<n;i++){
+        const d = document.createElement("div"); d.className = "fx" + (confetti?" cf":"");
+        if(confetti) d.style.background = PAL[i % PAL.length];
+        document.body.appendChild(d);
+        const a = Math.random()*Math.PI*2, v = (confetti?160:60) + Math.random()*(confetti?220:70);
+        const dx = Math.cos(a)*v, dy = Math.sin(a)*v - (confetti?120:20), rot = Math.random()*720;
+        d.animate([{transform:`translate(${cx}px,${cy}px) scale(1)`,opacity:1},{transform:`translate(${cx+dx}px,${cy+dy+(confetti?260:30)}px) rotate(${rot}deg) scale(.4)`,opacity:0}],{duration:confetti?1400+Math.random()*600:520+Math.random()*200,easing:"cubic-bezier(.2,.7,.4,1)"}).onfinish = () => d.remove();
+      }
+    }
+    function fxSlot(slot, n){ setTimeout(() => fxBurst(document.querySelectorAll(".fslot")[slot], n), 30); }
     function onWin(){
       G.over = true;
       const st = G.st;
@@ -1980,6 +2004,7 @@
       $("#nextBtn").textContent = (G.cfg.n === CLASSIC_LEVELS || G.cfg.n >= TOTAL_LEVELS) ? "Finish" : "Next Level";
       renderCoins();
       if(DUO.on){ $("#winReward").innerHTML += '<div class="duoWin">Team win! Player 1: ' + DUO.pts[0] + ' · Player 2: ' + DUO.pts[1] + '</div>'; DUO.pts = [0,0]; DUO.turn = 0; duoRender(); }
+      setTimeout(() => { fxBurst(document.getElementById("foundRow"), 70, true); fxBurst(document.getElementById("foundRow"), 50, true); }, 300);
       hideStory(); winStory();
       setTimeout(() => { $("#winOverlay").hidden = false; }, 550);
     }
@@ -2446,7 +2471,7 @@
   var btn = document.getElementById('installBtn');
   var deferred = null;
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js?v=20261016-duo1', { scope: './' }).catch(function(){});
+    navigator.serviceWorker.register('sw.js?v=20261016-juice1', { scope: './' }).catch(function(){});
   }
   window.addEventListener('beforeinstallprompt', function(e){
     e.preventDefault();
