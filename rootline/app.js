@@ -111,8 +111,8 @@ function pickFree(track){
   var from = fresh.length?fresh:pool.filter(function(w){return !R||R.word.id!==w.id;});
   return from[Math.floor(Math.random()*from.length)];
 }
-var duoStart=1;
-function ACT_duo(){ var keep = (R && R.duo) ? R.duo.p.slice() : [0,0]; closeModal(); var dw=pickFree("all"); screen="round"; try{ history.pushState({s:"round"},""); }catch(_){} startRound(dw,false,"all"); duoStart=1-duoStart; R.duo={p:keep,start:duoStart}; renderRound(); window.scrollTo(0,0); } function w0n(){ return R.word.L.length; }
+var duoStart=+(sessionStorage.getItem('rootline.duoStart')||1);
+function ACT_duo(){ var keep = (R && R.duo) ? R.duo.p.slice() : [0,0]; closeModal(); var dw=pickFree("all"); screen="round"; try{ history.pushState({s:"round"},""); }catch(_){} startRound(dw,false,"all"); duoStart=1-duoStart; try{ sessionStorage.setItem('rootline.duoStart', duoStart); }catch(_){} R.duo={p:keep,start:duoStart}; renderRound(); window.scrollTo(0,0); } function w0n(){ return R.word.L.length; }
 function startRound(word, daily, track){
   R = {word:word, daily:!!daily, track:track||"all", stage:"intro", layer:0, answered:false, picked:-1, results:[], opts:null, score:0, bonusSel:{}, bonusChecked:false, bonusPts:0, bonusHits:0};
   renderRound();
@@ -192,7 +192,7 @@ function renderRound(){
     h += '<div class="wordcard"><div class="tag">'+(hits===n?"Perfect dig!":"Dig complete")+'</div><div class="w" style="font-size:clamp(36px,9vw,60px)">'+esc(w.w)+' '+SB(w.w,"English")+'</div><div class="d">← '+w.L.map(function(l){return esc(l.f);}).join(" ← ")+'</div></div><div class="sep"></div>';
     if(window.wordStoryHTML) h += window.wordStoryHTML(w.w) ;
     h += '<div class="card"><p class="score">'+R.score+'</p><p class="muted" style="text-align:center;margin:0">points'+(hits===n?" (incl. +10 perfect-dig bonus)":"")+'</p><div class="trail">'+esc(R.trail)+'</div>';
-    h += '<p class="muted small" style="text-align:center">Root added to your Codex: <span class="sc" style="color:var(--gold2)">'+esc(w.root.f)+'</span> “'+esc(w.root.g)+'”</p>';
+    if(!R.duo) h += '<p class="muted small" style="text-align:center">Root added to your Codex: <span class="sc" style="color:var(--gold2)">'+esc(w.root.f)+'</span> “'+esc(w.root.g)+'”</p>';
     if(R.daily) h += '<button class="btn primary" data-act="sharedaily">Copy result to share</button><div class="sep"></div><button class="btn" data-act="free" data-track="all">Keep digging (Free Play) →</button>';
     else h += '<button class="btn primary" data-act="free" data-track="'+R.track+'">Next word →</button>';
     h += '<div class="sep"></div><div class="row"><button class="btn" data-act="codex">📜 Codex</button><button class="btn" data-act="home">Home</button></div></div><div id="wb-helper"></div>';
@@ -256,7 +256,8 @@ function finishRound(){
   if(hits===n) R.score += 10;
   var trail = R.results.map(function(x){return x?"🟩":"🟥";}).join("")+" ⭐"+R.bonusHits+"/"+w.B.y.length;
   R.trail = trail;
-  if(R.duo){ R.stage="done"; renderRound(); window.scrollTo(0,0); return; } /* duo rounds never touch the solo save */
+  if(R.duo){ [0,1].forEach(function(pl){ var mine=R.results.filter(function(_,i){ return (R.duo.start+i)%2===pl; }); if(mine.length && mine.every(Boolean)) R.duo.p[pl]+=10; });
+    R.stage="done"; renderRound(); window.scrollTo(0,0); return; } /* duo rounds never touch the solo save */
   var p = st.played[w.id]||{best:0,times:0}; p.best=Math.max(p.best,R.score); p.times++; st.played[w.id]=p;
   st.roots[w.root.k]=1; st.stats.digs++; st.stats.hits+=hits; st.stats.layers+=n;
   if(R.daily){
