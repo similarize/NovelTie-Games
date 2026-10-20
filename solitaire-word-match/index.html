@@ -15,7 +15,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png" />
 <link rel="manifest" href="assets/manifest.json?v=2" />
     <link rel="apple-touch-icon" href="assets/icon-180.png" />
-    <meta name="swm-build" content="20261016-art1" />
+    <meta name="swm-build" content="20261020-review1" />
     <title>Solitaire Word Match</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -441,6 +441,15 @@
       #wordStory .wsSrc, .winStory .wsSrc{ display:block; font-size:11.5px; color:#6d6556; margin-top:6px; }
       #wordStory .wsX{ position:absolute; top:8px; right:10px; font-size:16px; font-weight:700; color:#8a7d66; }
       .winStory{ background:#fffaf0; border:1.5px solid #e2d2ad; border-radius:12px; padding:10px 12px; margin:6px 0 12px; text-align:left; font-size:14px; line-height:1.42; }
+      .winReview{ background:#fffaf0; border:1.5px solid #e2d2ad; border-radius:12px; padding:8px 12px; margin:6px 0 10px; text-align:left; }
+      .winReview summary{ cursor:pointer; font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:#9a6a41; }
+      .winReview .rv{ padding:7px 0; border-top:1px solid #efe3c6; }
+      .winReview .rv:first-of-type{ border-top:0; margin-top:4px; }
+      .winReview .rvCat{ font-size:14.5px; font-weight:800; color:#2c2418; line-height:1.25; }
+      .winReview .rvSeq{ font-size:10.5px; font-weight:700; color:#8a6a2a; background:#f4e6c2; border-radius:6px; padding:1px 6px; margin-left:6px; vertical-align:middle; }
+      .winReview .rvWords{ font-size:13.5px; color:#4a4032; line-height:1.45; margin-top:2px; }
+      .winReview .rvCrown{ font-weight:800; color:#a8781e; }
+      .winReview .rvSplit{ color:#7b6a52; font-size:12px; }
       .winStory b.h{ display:block; font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:#9a6a41; }
       #toast{
         position:fixed; left:50%; bottom:96px; transform:translateX(-50%) translateY(20px); z-index:250;
@@ -549,6 +558,7 @@ body{background:radial-gradient(140% 100% at 50% 40%, rgba(0,0,0,0) 55%, rgba(0,
           <h2>Level Complete!</h2>
           <div class="winStars" id="winStars"></div>
           <p class="rewardLine" id="winReward"></p>
+          <details class="winReview" id="winReview" open hidden><summary>Review: the categories and their words</summary><div id="winReviewList"></div></details>
           <div class="winStory" id="winStory" hidden></div>
           <div class="rowBtns">
             <button class="bigBtn" id="nextBtn">Next Level</button>
@@ -1805,6 +1815,24 @@ body{background:radial-gradient(140% 100% at 50% 40%, rgba(0,0,0,0) 55%, rgba(0,
       el.classList.add("show");
       clearTimeout(storyTimer); storyTimer = setTimeout(hideStory, 10000);
     }
+    // end-of-level review (Bill, Oct 20, 2026): every category with its crown and words,
+    // in sequence order for ordered families; split words show the halves they were made from
+    function winReview(){
+      const box = $("#winReview"), list = $("#winReviewList"); box.hidden = true;
+      if(!G) return;
+      const plan = LEVEL_PLAN[G.cfg.n]; if(!plan || !plan.f) return;
+      const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+      const splits = G.cfg.halves ? (MEMBER_SPLITS[G.cfg.n] || []) : [];
+      list.innerHTML = plan.f.map(p => {
+        const words = p.members.map(w => {
+          const sp = splits.find(s => s[0] === p.id && s[1] === w);
+          return esc(w) + (sp ? ' <span class="rvSplit">(' + esc(sp[2]) + ' + ' + esc(sp[3]) + ')</span>' : "");
+        });
+        return '<div class="rv"><div class="rvCat">' + esc(p.label || p.crown) + (p.seq ? '<span class="rvSeq">in order</span>' : "") + '</div>' +
+          '<div class="rvWords"><span class="rvCrown">👑 ' + esc(p.crown) + '</span>' + (p.seq ? " → " : " · ") + words.join(p.seq ? " → " : ", ") + '</div></div>';
+      }).join("");
+      box.hidden = false;
+    }
     function winStory(){
       const box = $("#winStory"); box.hidden = true;
       if(!G) return;
@@ -2012,7 +2040,7 @@ body{background:radial-gradient(140% 100% at 50% 40%, rgba(0,0,0,0) 55%, rgba(0,
       renderCoins();
       if(DUO.on){ $("#winReward").innerHTML += '<div class="duoWin">Team win! Player 1: ' + DUO.pts[0] + ' · Player 2: ' + DUO.pts[1] + '</div>'; DUO.pts = [0,0]; DUO.turn = 0; duoRender(); }
       setTimeout(() => { fxBurst(document.getElementById("foundRow"), 70, true); fxBurst(document.getElementById("foundRow"), 50, true); }, 300);
-      hideStory(); winStory();
+      hideStory(); winReview(); winStory();
       setTimeout(() => { $("#winOverlay").hidden = false; }, 550);
     }
 
@@ -2478,7 +2506,7 @@ body{background:radial-gradient(140% 100% at 50% 40%, rgba(0,0,0,0) 55%, rgba(0,
   var btn = document.getElementById('installBtn');
   var deferred = null;
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js?v=20261016-art1', { scope: './' }).catch(function(){});
+    navigator.serviceWorker.register('sw.js?v=20261020-review1', { scope: './' }).catch(function(){});
   }
   window.addEventListener('beforeinstallprompt', function(e){
     e.preventDefault();
