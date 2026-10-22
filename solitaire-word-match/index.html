@@ -15,7 +15,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png" />
 <link rel="manifest" href="assets/manifest.json?v=2" />
     <link rel="apple-touch-icon" href="assets/icon-180.png" />
-    <meta name="swm-build" content="20261021-bright1" />
+    <meta name="swm-build" content="20261021-drop1" />
     <title>Solitaire Word Match</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -2186,6 +2186,39 @@ body{background:linear-gradient(180deg,#067c34 0%,#0f9447 14%,#13a04d 40%,#14a04
 
     /* ================= drag & drop + tap ================= */
     let drag = null, stockTap = false, lastTap = { cid:null, t:0 };
+    // Forgiving drop (Bill, Oct 21, 2026: drops "miss a lot"): the dragged card's own
+    // rectangle is matched against every slot and column (columns reach well below
+    // their last card, gaps between them count for the nearer one). A legal spot
+    // the card overlaps wins, the most overlap first; the spot under the finger
+    // is only a tiebreak / fallback, so the reason toast still shows on a bad drop.
+    function pickDrop(e){
+      const fingerT = resolveTarget(document.elementFromPoint(e.clientX, e.clientY));
+      const lead = drag.layer && drag.layer.firstChild;
+      const cands = [];
+      if(lead){
+        const a = lead.getBoundingClientRect();
+        const pad = 4, ext = a.height * 1.3;
+        const zones = [];
+        Array.from(foundEl.children).forEach((el, s) => { if(el.dataset && el.dataset.dz === "found") zones.push({ t:{ zone:"found", slot:s }, r:el.getBoundingClientRect(), ext:0 }); });
+        Array.from(boardEl.children).forEach((el, c) => { if(el.dataset && el.dataset.dz === "col") zones.push({ t:{ zone:"col", col:c }, r:el.getBoundingClientRect(), ext }); });
+        const wc = wasteEl.querySelector(".card:last-child");
+        if(wc) zones.push({ t:{ zone:"waste" }, r:wc.getBoundingClientRect(), ext:0 });
+        zones.forEach(z => {
+          let bottom = z.r.bottom;
+          if(z.t.zone === "col"){ const cards = boardEl.children[z.t.col].querySelectorAll(".card"); cards.forEach(cd => { const b = cd.getBoundingClientRect().bottom; if(b > bottom) bottom = b; }); bottom += z.ext; }
+          const ox = Math.min(a.right, z.r.right + pad) - Math.max(a.left, z.r.left - pad);
+          const oy = Math.min(a.bottom, bottom) - Math.max(a.top, z.r.top - pad);
+          if(ox > 0 && oy > 0 && ox * oy >= a.width * a.height * .2) cands.push({ target:z.t, area:ox * oy });
+        });
+      }
+      const same = (x, y) => x && y && x.zone === y.zone && x.slot === y.slot && x.col === y.col;
+      if(fingerT && !cands.some(c => same(c.target, fingerT))) cands.push({ target:fingerT, area:0 });
+      cands.forEach(c => { c.r = canDrop(G.st, drag.src, c.target); if(same(c.target, fingerT)) c.area += 1; });
+      const ok = cands.filter(c => c.r.ok).sort((x, y) => y.area - x.area);
+      if(ok.length) return { target:ok[0].target, r:ok[0].r };
+      const f = cands.find(c => same(c.target, fingerT)) || cands.sort((x, y) => y.area - x.area)[0];
+      return f ? { target:f.target, r:f.r } : null;
+    }
     function resolveTarget(el){
       if(!el || !el.closest) return null;
       const f = el.closest('[data-dz="found"]');
@@ -2297,13 +2330,9 @@ body{background:linear-gradient(180deg,#067c34 0%,#0f9447 14%,#13a04d 40%,#14a04
       }
       const dx = e.clientX - drag.startX, dy = e.clientY - drag.startY;
       if(drag.layer) drag.layer.style.transform = "translate3d(" + dx + "px," + dy + "px,0)";
-      const under = document.elementFromPoint(e.clientX, e.clientY);
-      const target = resolveTarget(under);
       clearDropMarks();
-      drag.cur = null;
-      if(target){
-        const r = canDrop(G.st, drag.src, target);
-        drag.cur = { target, r };
+      drag.cur = pickDrop(e);
+      if(drag.cur){
         // no green/red preview while dragging (Bill, Oct 15, 2026): the
         // drop itself takes the card or bounces it back
       }
@@ -2526,7 +2555,7 @@ body{background:linear-gradient(180deg,#067c34 0%,#0f9447 14%,#13a04d 40%,#14a04
   var btn = document.getElementById('installBtn');
   var deferred = null;
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js?v=20261021-bright1', { scope: './' }).catch(function(){});
+    navigator.serviceWorker.register('sw.js?v=20261021-drop1', { scope: './' }).catch(function(){});
   }
   window.addEventListener('beforeinstallprompt', function(e){
     e.preventDefault();
