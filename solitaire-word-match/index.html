@@ -15,7 +15,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png" />
 <link rel="manifest" href="assets/manifest.json?v=2" />
     <link rel="apple-touch-icon" href="assets/icon-180.png" />
-    <meta name="swm-build" content="20261021-tab5" />
+    <meta name="swm-build" content="20261021-tab6" />
     <title>Solitaire Word Match</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -512,6 +512,12 @@ body{background:linear-gradient(180deg,#067c34 0%,#0f9447 14%,#13a04d 40%,#14a04
 .fslot .famTag{height:auto !important;min-height:20px;line-height:1.08 !important;padding:3px 7px !important;white-space:normal !important;text-overflow:clip !important;overflow:visible !important;align-items:center;max-width:calc(100% + 4px) !important;left:-2px !important}
 .fslot .famTag > span{overflow:visible !important;text-overflow:clip !important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-word}
 .fslot .famTag.peek{white-space:nowrap !important;line-height:30px !important;padding:0 10px !important}
+/* tab bubble (Oct 21, 2026): tapping a tab shows the word in its own bubble; the tab itself never grows */
+.fslot .famTag.peek{max-width:calc(100% + 4px) !important;height:auto !important;line-height:1.08 !important;font-size:inherit !important;padding:3px 7px !important;white-space:normal !important;bottom:auto;box-shadow:0 0 0 2px #fff;border-radius:8px 8px 0 0 !important}
+#tagBubble{position:fixed;z-index:300;max-width:min(80vw,320px);background:#fff8dc;color:#3a2600;border:2px solid #e2a92b;border-radius:14px;padding:9px 14px;box-shadow:0 6px 18px rgba(0,0,0,.35);text-align:center;pointer-events:none;opacity:0;transform:translateY(6px) scale(.96);transition:opacity .15s ease,transform .15s ease}
+#tagBubble.on{opacity:1;transform:none}
+#tagBubble b{display:block;font-size:19px;line-height:1.2;font-weight:800}
+#tagBubble small{display:block;margin-top:2px;font-size:12.5px;opacity:.75}
 </style>
   </head>
   <body>
@@ -2236,7 +2242,21 @@ body{background:linear-gradient(180deg,#067c34 0%,#0f9447 14%,#13a04d 40%,#14a04
     }
     // expanded pile tabs stay open until the next tap anywhere
     function clearPeeks(){
-      document.querySelectorAll(".famTag.peek").forEach(t => { t.classList.remove("peek"); const sp = t.querySelector("span:last-child"); if(sp && t.dataset.keep != null) sp.innerHTML = t.dataset.keep; });
+      document.querySelectorAll(".famTag.peek").forEach(t => t.classList.remove("peek"));
+      const b = document.getElementById("tagBubble"); if(b) b.remove();
+      clearTimeout(clearPeeks.t);
+    }
+    // tap a pile tab: a clean bubble shows the whole crown word, then fades away
+    function showTagBubble(tag){
+      tag.classList.add("peek");
+      const b = document.createElement("div"); b.id = "tagBubble";
+      b.innerHTML = '<b>👑 ' + esc(tag.dataset.full) + '</b><small>' + tag.dataset.n + ' of ' + tag.dataset.of + ' cards</small>';
+      document.body.appendChild(b);
+      const r = tag.getBoundingClientRect(), w = b.offsetWidth, vw = innerWidth;
+      b.style.left = Math.max(8, Math.min(vw - w - 8, r.left + r.width/2 - w/2)) + "px";
+      b.style.top = Math.max(8, r.top - b.offsetHeight - 8) + "px";
+      requestAnimationFrame(() => b.classList.add("on"));
+      clearPeeks.t = setTimeout(clearPeeks, 2200);
     }
     function resolveTarget(el){
       if(!el || !el.closest) return null;
@@ -2339,12 +2359,7 @@ body{background:linear-gradient(180deg,#067c34 0%,#0f9447 14%,#13a04d 40%,#14a04
         drag = null; e.preventDefault();
         const was = tag.classList.contains("peek");
         clearPeeks();
-        if(!was){
-          const sp = tag.querySelector("span:last-child");
-          if(sp){ tag.dataset.keep = sp.innerHTML; sp.textContent = tag.dataset.full; }
-          tag.classList.add("peek");
-          toast("👑 " + tag.dataset.full + "  ·  " + tag.dataset.n + " of " + tag.dataset.of, 4000);
-        }
+        if(!was) showTagBubble(tag);
         return;
       }
       clearPeeks();
@@ -2590,7 +2605,7 @@ body{background:linear-gradient(180deg,#067c34 0%,#0f9447 14%,#13a04d 40%,#14a04
   var btn = document.getElementById('installBtn');
   var deferred = null;
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js?v=20261021-tab5', { scope: './' }).catch(function(){});
+    navigator.serviceWorker.register('sw.js?v=20261021-tab6', { scope: './' }).catch(function(){});
   }
   window.addEventListener('beforeinstallprompt', function(e){
     e.preventDefault();
