@@ -15,7 +15,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png" />
 <link rel="manifest" href="assets/manifest.json?v=2" />
     <link rel="apple-touch-icon" href="assets/icon-180.png" />
-    <meta name="swm-build" content="20261021-tab2" />
+    <meta name="swm-build" content="20261021-tab3" />
     <title>Solitaire Word Match</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -2229,6 +2229,10 @@ body{background:linear-gradient(180deg,#067c34 0%,#0f9447 14%,#13a04d 40%,#14a04
       const f = cands.find(c => same(c.target, fingerT)) || cands.sort((x, y) => y.area - x.area)[0];
       return f ? { target:f.target, r:f.r } : null;
     }
+    // expanded pile tabs stay open until the next tap anywhere
+    function clearPeeks(){
+      document.querySelectorAll(".famTag.peek").forEach(t => { t.classList.remove("peek"); const sp = t.querySelector("span:last-child"); if(sp && t.dataset.keep != null) sp.innerHTML = t.dataset.keep; });
+    }
     function resolveTarget(el){
       if(!el || !el.closest) return null;
       const f = el.closest('[data-dz="found"]');
@@ -2328,16 +2332,17 @@ body{background:linear-gradient(180deg,#067c34 0%,#0f9447 14%,#13a04d 40%,#14a04
       const tag = e.target.closest(".famTag");
       if(tag){
         drag = null; e.preventDefault();
-        toast("👑 " + tag.dataset.full + "  ·  " + tag.dataset.n + " of " + tag.dataset.of, 2600);
-        const sp = tag.querySelector("span:last-child");
-        if(sp && !tag.classList.contains("peek")){
-          const keep = sp.innerHTML;
-          sp.textContent = tag.dataset.full + " · " + tag.dataset.n + "/" + tag.dataset.of;
+        const was = tag.classList.contains("peek");
+        clearPeeks();
+        if(!was){
+          const sp = tag.querySelector("span:last-child");
+          if(sp){ tag.dataset.keep = sp.innerHTML; sp.textContent = tag.dataset.full + " · " + tag.dataset.n + "/" + tag.dataset.of; }
           tag.classList.add("peek");
-          setTimeout(() => { if(tag.isConnected){ tag.classList.remove("peek"); sp.innerHTML = keep; } }, 2600);
+          toast("👑 " + tag.dataset.full + "  ·  " + tag.dataset.n + " of " + tag.dataset.of, 4000);
         }
         return;
       }
+      clearPeeks();
       const cardEl = e.target.closest(".card[data-zone]");
       if(cardEl){
         const src = srcFromCard(cardEl);
@@ -2580,7 +2585,7 @@ body{background:linear-gradient(180deg,#067c34 0%,#0f9447 14%,#13a04d 40%,#14a04
   var btn = document.getElementById('installBtn');
   var deferred = null;
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js?v=20261021-tab2', { scope: './' }).catch(function(){});
+    navigator.serviceWorker.register('sw.js?v=20261021-tab3', { scope: './' }).catch(function(){});
   }
   window.addEventListener('beforeinstallprompt', function(e){
     e.preventDefault();
