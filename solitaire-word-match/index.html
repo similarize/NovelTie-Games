@@ -15,7 +15,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png" />
 <link rel="manifest" href="assets/manifest.json?v=2" />
     <link rel="apple-touch-icon" href="assets/icon-180.png" />
-    <meta name="swm-build" content="20261021-tab1" />
+    <meta name="swm-build" content="20261021-tab2" />
     <title>Solitaire Word Match</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -500,11 +500,13 @@ body{background:linear-gradient(180deg,#067c34 0%,#0f9447 14%,#13a04d 40%,#14a04
 .boost.shuffle{background:linear-gradient(#ffcc3d,#f5a10f);box-shadow:0 5px 0 #d58a0a,0 7px 10px rgba(0,0,0,.2),inset 0 2px 0 rgba(255,255,255,.5)}
 .boost .cnt{background:#ef3b3b;color:#fff;border:2px solid #fff;min-width:24px;height:24px}
 /* readable folder tabs (Oct 21, 2026): bigger text, tap shows the whole crown word */
-#foundRow{padding-top:22px !important}
-.fslot .famTag{pointer-events:auto;cursor:pointer;height:20px;line-height:20px;left:2px;max-width:calc(100% - 4px);padding:0 7px;font-weight:700;color:#4a2f00;border-radius:8px 8px 0 0;letter-spacing:0}
+#foundRow{padding-top:24px !important}
+.fslot .famTag{pointer-events:auto;cursor:pointer;height:22px;line-height:22px;left:2px;max-width:calc(100% - 4px);padding:0 7px;font-weight:700;color:#4a2f00;border-radius:8px 8px 0 0;letter-spacing:0}
 .fslot .famTag svg{width:11px;height:11px}
 .fslot .famTag::after{content:"";position:absolute;inset:-8px -2px 0}
-.fslot .famTag.peek{max-width:none;z-index:60;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+.fslot .famTag.peek{max-width:none;overflow:visible;z-index:60;height:30px;line-height:30px;font-size:16px !important;padding:0 10px;border-radius:10px;bottom:calc(100% + 2px);box-shadow:0 3px 10px rgba(0,0,0,.4)}
+.fslot .famTag.peek > span{overflow:visible}
+.fslot:has(.famTag.peek){z-index:60}
 </style>
   </head>
   <body>
@@ -1708,7 +1710,7 @@ body{background:linear-gradient(180deg,#067c34 0%,#0f9447 14%,#13a04d 40%,#14a04
           if(banked.length > 1){
             const cw = crownWord;
             const plain = String(cw).replace(/<[^>]*>/g, "");
-            const fsz = plain.length > 14 ? 10 : plain.length > 10 ? 11 : 12.5;
+            const fsz = plain.length > 14 ? 11 : plain.length > 10 ? 12.5 : 14;
             slot.insertAdjacentHTML("beforeend", '<span class="famTag" role="button" data-full="' + esc(plain) + '" data-n="' + banked.length + '" data-of="' + FAMTOTAL[fam] + '" style="font-size:' + fsz + 'px">' + svgIcon("crown") + "<span>" + cw + "</span></span>");
             slot.setAttribute("aria-label", cw + " pile, " + banked.length + " of " + FAMTOTAL[fam] + " cards");
           }
@@ -2327,7 +2329,13 @@ body{background:linear-gradient(180deg,#067c34 0%,#0f9447 14%,#13a04d 40%,#14a04
       if(tag){
         drag = null; e.preventDefault();
         toast("👑 " + tag.dataset.full + "  ·  " + tag.dataset.n + " of " + tag.dataset.of, 2600);
-        tag.classList.add("peek"); setTimeout(() => tag.classList.remove("peek"), 2600);
+        const sp = tag.querySelector("span:last-child");
+        if(sp && !tag.classList.contains("peek")){
+          const keep = sp.innerHTML;
+          sp.textContent = tag.dataset.full + " · " + tag.dataset.n + "/" + tag.dataset.of;
+          tag.classList.add("peek");
+          setTimeout(() => { if(tag.isConnected){ tag.classList.remove("peek"); sp.innerHTML = keep; } }, 2600);
+        }
         return;
       }
       const cardEl = e.target.closest(".card[data-zone]");
@@ -2572,7 +2580,7 @@ body{background:linear-gradient(180deg,#067c34 0%,#0f9447 14%,#13a04d 40%,#14a04
   var btn = document.getElementById('installBtn');
   var deferred = null;
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js?v=20261021-tab1', { scope: './' }).catch(function(){});
+    navigator.serviceWorker.register('sw.js?v=20261021-tab2', { scope: './' }).catch(function(){});
   }
   window.addEventListener('beforeinstallprompt', function(e){
     e.preventDefault();
