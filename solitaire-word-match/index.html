@@ -15,11 +15,11 @@
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png?v=3" />
 <link rel="manifest" href="assets/manifest.json?v=3" />
     <link rel="apple-touch-icon" href="assets/icon-180.png?v=3" />
-    <meta name="swm-build" content="20261022-tab10" />
+    <meta name="swm-build" content="20261022-tab11" />
     <title>Solitaire Word Match</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@600;700&display=swap" rel="stylesheet" />
     <style>
       :root{
         color-scheme: light dark;
@@ -509,6 +509,18 @@ body{background:linear-gradient(180deg,#067c34 0%,#0f9447 14%,#13a04d 40%,#14a04
 .fslot .famTag{height:auto !important;min-height:20px;line-height:1.08 !important;padding:3px 7px !important;white-space:normal !important;text-overflow:clip !important;overflow:visible !important;align-items:center;max-width:calc(100% + 4px) !important;left:-2px !important}
 .fslot .famTag > span{overflow:visible !important;text-overflow:clip !important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-word}
 /* tab bubble (Oct 21, 2026): tapping a tab shows the word in its own bubble; the tab itself never grows */
+/* tab11: legible condensed lettering that always stays inside the tab */
+.fslot .famTag{font-family:"Barlow Semi Condensed","Roboto Condensed","Arial Narrow",system-ui,sans-serif !important;font-weight:700 !important;letter-spacing:.01em !important;
+  left:2px !important;max-width:calc(100% - 4px) !important;overflow:hidden !important;padding:2px 5px 2px 4px !important;gap:3px !important;line-height:1.05 !important;max-height:34px}
+.fslot .famTag > span{overflow:hidden !important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;max-height:2.2em;word-break:normal !important;overflow-wrap:normal;hyphens:manual;text-align:left}
+.fslot .famTag.tight > span{overflow-wrap:anywhere}
+.fslot .famTag.noCrown svg{display:none}
+.fslot .famTag.noCrown{padding:2px 4px !important}
+.fslot .famTag[data-lines="3"]{max-height:36px}
+.fslot .famTag[data-lines="3"] > span{-webkit-line-clamp:3;max-height:3.2em}
+#foundRow{padding-top:36px !important}
+.fslot .famTag svg{width:10px !important;height:10px !important}
+#tagBubble{font-family:"Barlow Semi Condensed","Roboto Condensed","Arial Narrow",system-ui,sans-serif;font-weight:700;letter-spacing:.01em}
 #tagBubble{position:fixed;z-index:9999;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;white-space:nowrap;pointer-events:none;
   background:linear-gradient(180deg,#ffe58c,#f0b93e);color:#5a3a00;font-weight:800;border-radius:8px 8px 0 0;
   box-shadow:0 -1px 2px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.6);
@@ -1737,6 +1749,7 @@ body{background:linear-gradient(180deg,#067c34 0%,#0f9447 14%,#13a04d 40%,#14a04
             const plain = String(cw).replace(/<[^>]*>/g, "");
             const fsz = plain.length > 16 ? 11 : plain.length > 9 ? 12 : 14;
             slot.insertAdjacentHTML("beforeend", '<span class="famTag" role="button" data-full="' + esc(plain) + '" data-n="' + banked.length + '" data-of="' + FAMTOTAL[fam] + '" style="font-size:' + fsz + 'px">' + svgIcon("crown") + "<span>" + cw + "</span></span>");
+            if(!fitTags.q){ fitTags.q = 1; requestAnimationFrame(fitTags); }
             slot.setAttribute("aria-label", cw + " pile, " + banked.length + " of " + FAMTOTAL[fam] + " cards");
           }
           if(done){
@@ -2257,6 +2270,41 @@ body{background:linear-gradient(180deg,#067c34 0%,#0f9447 14%,#13a04d 40%,#14a04
     // expanded pile tabs stay open until the next tap anywhere
     // tap a pile tab: the tab itself swells into a big gold bubble with the whole
     // crown word, holds for a moment, then shrinks back into the tab
+    // shrink each pile tab's text (13px down to 9px) until the word fits inside the tab
+    function fitTags(){
+      fitTags.q = 0;
+      const ctx = fitTags.c || (fitTags.c = document.createElement("canvas").getContext("2d"));
+      const fam = '"Barlow Semi Condensed","Roboto Condensed","Arial Narrow",system-ui,sans-serif';
+      document.querySelectorAll(".fslot .famTag").forEach(t => {
+        const s = t.querySelector("span"); if(!s) return;
+        const words = (t.dataset.full || s.textContent).trim().split(/\s+/);
+        const box = t.parentElement.clientWidth - 4 - 8 - 2;   // slot minus margins, padding, slack
+        const fits = (f, crown, maxL) => {
+          ctx.font = "700 " + f + "px " + fam;
+          const avail = box - (crown ? 13 : 0), w = x => ctx.measureText(x).width;
+          let lines = 1, cur = "";
+          for(const wd of words){
+            if(w(wd) > avail) return false;
+            const nx = cur ? cur + " " + wd : wd;
+            if(w(nx) <= avail) cur = nx; else { lines++; cur = wd; }
+          }
+          return lines <= maxL;
+        };
+        // try: crown + 2 lines, then no crown + 2 lines, then no crown + 3 lines
+        const tries = [[true, 2, 13, 10], [false, 2, 12, 9.5], [false, 3, 10.5, 8.5]];
+        let pick = null;
+        for(const [crown, L, hi, lo] of tries){
+          for(let f = hi; f >= lo; f -= 0.5) if(fits(f, crown, L)){ pick = [f, crown, L]; break; }
+          if(pick) break;
+        }
+        const tight = !pick; if(tight) pick = [8.5, false, 3];
+        t.style.fontSize = pick[0] + "px";
+        t.classList.toggle("noCrown", !pick[1]);
+        t.classList.toggle("tight", tight);
+        t.dataset.lines = pick[2];
+      });
+    }
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(() => fitTags());
     function clearPeeks(){
       clearTimeout(clearPeeks.t); clearTimeout(clearPeeks.t2);
       const b = document.getElementById("tagBubble"); if(b) b.remove();
@@ -2619,7 +2667,7 @@ body{background:linear-gradient(180deg,#067c34 0%,#0f9447 14%,#13a04d 40%,#14a04
     saveNow();
     requestPersist();
     // debug/test hook (used by automated verification; harmless in play)
-    window.__wp = { startLevel, enumMoves_: (st, p) => enumMoves(st, p), generateLevel, solve, greedySolve, levelCfg, LEVEL_PLAN, doMove, render, FAMTOTAL: () => FAMTOTAL, REG: () => REG, applyMove, enumMoves, canDrop, isWin, getState: () => G, session: S, SAVE_KEY, encodeBackup, decodeBackup, saveNow };
+    window.__wp = { fitTags, startLevel, enumMoves_: (st, p) => enumMoves(st, p), generateLevel, solve, greedySolve, levelCfg, LEVEL_PLAN, doMove, render, FAMTOTAL: () => FAMTOTAL, REG: () => REG, applyMove, enumMoves, canDrop, isWin, getState: () => G, session: S, SAVE_KEY, encodeBackup, decodeBackup, saveNow };
 </script>
 <script>
 /* In-page install button + service worker registration (installability). */
@@ -2627,7 +2675,7 @@ body{background:linear-gradient(180deg,#067c34 0%,#0f9447 14%,#13a04d 40%,#14a04
   var btn = document.getElementById('installBtn');
   var deferred = null;
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js?v=20261022-tab10', { scope: './' }).catch(function(){});
+    navigator.serviceWorker.register('sw.js?v=20261022-tab11', { scope: './' }).catch(function(){});
   }
   window.addEventListener('beforeinstallprompt', function(e){
     e.preventDefault();
