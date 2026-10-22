@@ -4,8 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="light dark" />
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0e8f3c" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0c7f34" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#067c34" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#067c34" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Solitaire Word Match" />
@@ -15,7 +15,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png" />
 <link rel="manifest" href="assets/manifest.json?v=2" />
     <link rel="apple-touch-icon" href="assets/icon-180.png" />
-    <meta name="swm-build" content="20261021-slots5" />
+    <meta name="swm-build" content="20261021-bright1" />
     <title>Solitaire Word Match</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -479,6 +479,26 @@ body{background:radial-gradient(140% 100% at 50% 40%, rgba(0,0,0,0) 55%, rgba(0,
 .card:not(.back):not(.keyCard)::after{opacity:.35}
 .card:not(.back):not(.keyCard){outline:1.5px solid rgba(176,138,72,.35);outline-offset:-5px}
 .fslot{box-shadow:inset 0 2px 10px rgba(0,0,0,.35), inset 0 0 0 1.5px rgba(255,255,255,.08)}
+/* bright pass (Oct 21, 2026, Hark, per Bill's reference screenshot): vivid flat felt, white cards, bright blue backs. Overrides the art pass above. */
+:root{--felt:#16a24f;--felt-deep:#11954a;--felt-edge:#0a7a37;--card-line:#ece2cb;--gold:#f7b928;--gold-deep:#d99a12}
+@media (prefers-color-scheme: dark){:root{--felt:#16a24f;--felt-deep:#11954a;--felt-edge:#0a7a37;--panel:#fff7e9}}
+body{background:linear-gradient(180deg,#067c34 0%,#0f9447 14%,#13a04d 40%,#14a04e 100%), #13a04d !important;background-attachment:fixed}
+.fslot{background:rgba(0,80,32,.30) !important;box-shadow:inset 0 2px 4px rgba(0,0,0,.16) !important;border-radius:12px}
+.fslot.done{box-shadow:inset 0 2px 4px rgba(0,0,0,.16), 0 0 0 3px var(--gold), 0 0 14px rgba(255,210,80,.6) !important}
+.fslot .ghostCrown{color:rgba(255,255,255,.16)}
+.col:empty::after,.col.emptyCol::after{background:rgba(0,80,32,.28);box-shadow:inset 0 2px 4px rgba(0,0,0,.14);border-radius:12px}
+.card{border-radius:12px;box-shadow:0 3px 0 rgba(0,60,25,.25),0 4px 8px rgba(0,0,0,.16),inset 0 0 0 2px #fff,inset 0 0 0 3.5px var(--card-line)}
+.card:not(.back):not(.keyCard){background:linear-gradient(180deg,#fffefb 0%,#fffbf2 70%,#fbf4e2 100%) !important;outline:none}
+.card::before,.card::after,.card:not(.back):not(.keyCard)::after{opacity:.2}
+.card.back{background:repeating-conic-gradient(from 45deg,#4aa9ff 0% 25%,#2b8ef6 0% 50%) center/30px 30px;
+  box-shadow:0 3px 0 rgba(0,60,25,.25),0 4px 8px rgba(0,0,0,.16),inset 0 0 0 4px #fff,inset 0 0 0 5px #d8ecff}
+.card.crownCard{box-shadow:0 3px 0 rgba(0,60,25,.25),0 4px 8px rgba(0,0,0,.16),inset 0 0 0 4px var(--gold),inset 0 0 0 6px #fff4cf}
+.movesRibbon{background:linear-gradient(#36cf73,#25b35c);color:#0b4a24}
+.coinPill,.iconBtn{background:rgba(0,40,15,.42)}
+.boost{width:68px;height:62px;border-radius:20px;box-shadow:0 5px 0 #e3eafb,0 7px 10px rgba(0,0,0,.2),inset 0 -3px 0 rgba(0,0,0,.12),inset 0 2px 0 rgba(255,255,255,.5)}
+.boost.hint,.boost.undo{background:linear-gradient(#7aa9ff,#4f7fe6)}
+.boost.shuffle{background:linear-gradient(#ffcc3d,#f5a10f);box-shadow:0 5px 0 #d58a0a,0 7px 10px rgba(0,0,0,.2),inset 0 2px 0 rgba(255,255,255,.5)}
+.boost .cnt{background:#ef3b3b;color:#fff;border:2px solid #fff;min-width:24px;height:24px}
 </style>
   </head>
   <body>
@@ -2506,7 +2526,7 @@ body{background:radial-gradient(140% 100% at 50% 40%, rgba(0,0,0,0) 55%, rgba(0,
   var btn = document.getElementById('installBtn');
   var deferred = null;
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js?v=20261021-slots5', { scope: './' }).catch(function(){});
+    navigator.serviceWorker.register('sw.js?v=20261021-bright1', { scope: './' }).catch(function(){});
   }
   window.addEventListener('beforeinstallprompt', function(e){
     e.preventDefault();
