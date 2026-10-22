@@ -1,10 +1,10 @@
-/* Service worker for Solitaire Word Match — build 20261021-drop1.
+/* Service worker for Solitaire Word Match — build 20261021-tab1.
    Exists so the page meets Chrome's installability criteria
    (registered worker with a fetch handler). Pass-through, network
    first, no caching: the page and its assets always come fresh
    from the network, so a new build reaches phones on the next load.
    Bump SW_VERSION on every release so browsers swap in this worker. */
-var SW_VERSION = '20261021-drop1';
+var SW_VERSION = '20261021-tab1';
 self.addEventListener('install', function (e) {
   self.skipWaiting();
 });
