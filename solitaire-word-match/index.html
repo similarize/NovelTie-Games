@@ -15,7 +15,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png?v=3" />
 <link rel="manifest" href="assets/manifest.json?v=3" />
     <link rel="apple-touch-icon" href="assets/icon-180.png?v=3" />
-    <meta name="swm-build" content="20261021-bright2" />
+    <meta name="swm-build" content="20261021-tab9" />
     <title>Solitaire Word Match</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -504,21 +504,21 @@ body{background:linear-gradient(180deg,#067c34 0%,#0f9447 14%,#13a04d 40%,#14a04
 .fslot .famTag{pointer-events:auto;cursor:pointer;height:22px;line-height:22px;left:2px;max-width:calc(100% - 4px);padding:0 7px;font-weight:700;color:#4a2f00;border-radius:8px 8px 0 0;letter-spacing:0}
 .fslot .famTag svg{width:11px;height:11px}
 .fslot .famTag::after{content:"";position:absolute;inset:-8px -2px 0}
-.fslot .famTag.peek{max-width:none;overflow:visible;z-index:60;height:30px;line-height:30px;font-size:16px !important;padding:0 10px;border-radius:10px;bottom:calc(100% + 2px);box-shadow:0 3px 10px rgba(0,0,0,.4)}
-.fslot .famTag.peek > span{overflow:visible}
-.fslot:has(.famTag.peek){z-index:60}
 /* tab4: the tab always shows the whole crown word, wrapping to two lines if needed */
 #foundRow{padding-top:32px !important}
 .fslot .famTag{height:auto !important;min-height:20px;line-height:1.08 !important;padding:3px 7px !important;white-space:normal !important;text-overflow:clip !important;overflow:visible !important;align-items:center;max-width:calc(100% + 4px) !important;left:-2px !important}
 .fslot .famTag > span{overflow:visible !important;text-overflow:clip !important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-word}
-.fslot .famTag.peek{white-space:nowrap !important;line-height:30px !important;padding:0 10px !important}
 /* tab bubble (Oct 21, 2026): tapping a tab shows the word in its own bubble; the tab itself never grows */
-.fslot .famTag.peek{max-width:calc(100% + 4px) !important;height:auto !important;line-height:1.08 !important;font-size:inherit !important;padding:3px 7px !important;white-space:normal !important;bottom:auto;box-shadow:0 0 0 2px #fff;border-radius:8px 8px 0 0 !important}
-#tagBubble{position:fixed;z-index:9999;max-width:min(80vw,320px);background:#fff8dc;color:#3a2600;border:2px solid #e2a92b;border-radius:14px;padding:9px 14px;box-shadow:0 6px 18px rgba(0,0,0,.35);text-align:center;pointer-events:none;animation:tagPop .16s ease-out}
-@keyframes tagPop{from{opacity:0;transform:translateY(6px) scale(.96)}}
-#tagBubble b{display:block;font-size:19px;line-height:1.2;font-weight:800}
-#tagBubble b svg{width:18px;height:18px;vertical-align:-2px;color:#d99a0b;fill:currentColor}
-#tagBubble small{display:block;margin-top:2px;font-size:12.5px;opacity:.75}
+#tagBubble{position:fixed;z-index:9999;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;white-space:nowrap;pointer-events:none;
+  background:linear-gradient(180deg,#ffe58c,#f0b93e);color:#5a3a00;font-weight:800;border-radius:8px 8px 0 0;
+  box-shadow:0 -1px 2px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.6);
+  transition:left .24s cubic-bezier(.2,.9,.3,1.15),top .24s cubic-bezier(.2,.9,.3,1.15),width .24s cubic-bezier(.2,.9,.3,1.15),height .24s cubic-bezier(.2,.9,.3,1.15),font-size .24s ease,border-radius .24s ease,box-shadow .24s ease,padding .24s ease}
+#tagBubble .tbW{display:flex;align-items:center;gap:.3em;line-height:1.1}
+#tagBubble .tbW svg{width:1em;height:1em;flex:none}
+#tagBubble .tbN{font-size:12px;font-weight:700;color:#7a5410;line-height:1;max-height:0;opacity:0;transition:opacity .18s ease,max-height .24s ease,margin .24s ease}
+#tagBubble.big{border-radius:18px;box-shadow:0 0 0 3px #fff,0 10px 26px rgba(0,40,10,.45);padding:10px 18px}
+#tagBubble.big .tbN{max-height:16px;opacity:1;margin-top:5px}
+#tagBubble.measure{transition:none;width:auto !important;height:auto !important;font-size:21px !important}
 /* bright sheets (Oct 21, 2026): intro and other pop-up sheets match the bright felt: white card, gold rim, blue title */
 .overlay{background:rgba(0,70,30,.38) !important;backdrop-filter:blur(2px)}
 .sheet{background:linear-gradient(180deg,#ffffff 0%,#f4f9ff 100%) !important;border:4px solid #ffcf3a !important;border-radius:22px !important;box-shadow:0 0 0 3px #fff,0 16px 40px rgba(0,40,10,.45) !important;color:#23324a}
@@ -2255,22 +2255,30 @@ body{background:linear-gradient(180deg,#067c34 0%,#0f9447 14%,#13a04d 40%,#14a04
       return f ? { target:f.target, r:f.r } : null;
     }
     // expanded pile tabs stay open until the next tap anywhere
+    // tap a pile tab: the tab itself swells into a big gold bubble with the whole
+    // crown word, holds for a moment, then shrinks back into the tab
     function clearPeeks(){
-      document.querySelectorAll(".famTag[data-open]").forEach(t => t.removeAttribute("data-open"));
+      clearTimeout(clearPeeks.t); clearTimeout(clearPeeks.t2);
       const b = document.getElementById("tagBubble"); if(b) b.remove();
-      clearTimeout(clearPeeks.t);
+      document.querySelectorAll(".famTag[data-open]").forEach(t => { t.removeAttribute("data-open"); t.style.visibility = ""; });
     }
-    // tap a pile tab: a clean bubble shows the whole crown word, then fades away
     function showTagBubble(tag){
-      tag.dataset.open = "1";
+      const r = tag.getBoundingClientRect(), fs = getComputedStyle(tag).fontSize;
       const b = document.createElement("div"); b.id = "tagBubble"; b.setAttribute("role", "status");
-      b.innerHTML = '<b>' + svgIcon("crown") + ' ' + esc(tag.dataset.full) + '</b><small>' + tag.dataset.n + ' of ' + tag.dataset.of + ' cards</small>';
+      b.innerHTML = '<span class="tbW">' + svgIcon("crown") + "<span>" + esc(tag.dataset.full) + '</span></span><span class="tbN">' + tag.dataset.n + " of " + tag.dataset.of + " cards</span>";
+      const small = () => { b.style.left = r.left + "px"; b.style.top = r.top + "px"; b.style.width = r.width + "px"; b.style.height = r.height + "px"; b.style.fontSize = fs; };
+      // measure the big size first
+      b.className = "big measure"; b.style.left = "0px"; b.style.top = "0px";
       document.body.appendChild(b);
-      const r = tag.getBoundingClientRect(), w = b.offsetWidth, vw = innerWidth;
-      b.style.left = Math.max(8, Math.min(vw - w - 8, r.left + r.width/2 - w/2)) + "px";
-      b.style.top = Math.max(8, r.top - b.offsetHeight - 8) + "px";
-      b.classList.add("on");
-      clearPeeks.t = setTimeout(clearPeeks, 2600);
+      const W = Math.min(b.offsetWidth, innerWidth - 16), H = b.offsetHeight;
+      b.className = ""; small(); void b.offsetWidth;
+      tag.dataset.open = "1"; tag.style.visibility = "hidden";
+      const L = Math.max(8, Math.min(innerWidth - W - 8, r.left + r.width / 2 - W / 2)), T = Math.max(8, r.bottom - H);
+      b.classList.add("big"); b.style.left = L + "px"; b.style.top = T + "px"; b.style.width = W + "px"; b.style.height = H + "px"; b.style.fontSize = "21px";
+      clearPeeks.t = setTimeout(() => {
+        b.classList.remove("big"); small();
+        clearPeeks.t2 = setTimeout(clearPeeks, 260);
+      }, 1900);
     }
     function resolveTarget(el){
       if(!el || !el.closest) return null;
@@ -2619,7 +2627,7 @@ body{background:linear-gradient(180deg,#067c34 0%,#0f9447 14%,#13a04d 40%,#14a04
   var btn = document.getElementById('installBtn');
   var deferred = null;
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js?v=20261021-bright2', { scope: './' }).catch(function(){});
+    navigator.serviceWorker.register('sw.js?v=20261021-tab9', { scope: './' }).catch(function(){});
   }
   window.addEventListener('beforeinstallprompt', function(e){
     e.preventDefault();
