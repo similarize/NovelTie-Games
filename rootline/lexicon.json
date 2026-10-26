@@ -1,0 +1,1994 @@
+{
+ "version": 1,
+ "updated": "2026-10-26T05:16:55Z",
+ "about": "Rootline 'Hidden Weight' lexicon: words whose origin carries more weight than people realise. Origins checked against the linked Wiktionary entries.",
+ "entries": [
+  {
+   "id": "hysterical",
+   "word": "hysterical",
+   "forms": [
+    "hysterical",
+    "hysterically",
+    "hysteria",
+    "hysterics"
+   ],
+   "heat": 2,
+   "category": "gendered",
+   "neutral_swap": "very upset",
+   "alternatives": [
+    "very upset",
+    "overwhelmed",
+    "panicked",
+    "distraught"
+   ],
+   "false_friends": [],
+   "origin": "Greek hystera, 'womb' (via Latin hystericus)",
+   "why_it_lands": "Built on the Greek word for womb, it echoes an old belief that strong emotion was a disorder of women's bodies.",
+   "sources": [
+    {
+     "title": "Wiktionary: hysterical",
+     "url": "https://en.wiktionary.org/wiki/hysterical#English"
+    },
+    {
+     "title": "Wiktionary: hysteria",
+     "url": "https://en.wiktionary.org/wiki/hysteria#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en",
+   "cross_lang": [
+    {
+     "lang": "fr",
+     "word": "hystérie",
+     "note": "same Greek root"
+    }
+   ]
+  },
+  {
+   "id": "hussy",
+   "word": "hussy",
+   "forms": [
+    "hussy",
+    "hussies"
+   ],
+   "heat": 2,
+   "category": "gendered",
+   "neutral_swap": "woman",
+   "alternatives": [
+    "woman",
+    "person"
+   ],
+   "false_friends": [],
+   "origin": "Middle English houswyf, 'housewife', worn down by sound change",
+   "why_it_lands": "A worn-down form of 'housewife' that slid into an insult judging a woman's sexual conduct.",
+   "sources": [
+    {
+     "title": "Wiktionary: hussy",
+     "url": "https://en.wiktionary.org/wiki/hussy#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "spinster",
+   "word": "spinster",
+   "forms": [
+    "spinster",
+    "spinsters",
+    "spinsterhood"
+   ],
+   "heat": 1,
+   "category": "gendered",
+   "neutral_swap": "single woman",
+   "alternatives": [
+    "single woman",
+    "unmarried woman",
+    "single"
+   ],
+   "false_friends": [],
+   "origin": "Middle English spynnestere, 'woman who spins fibre'",
+   "why_it_lands": "Once a job title for women who spun thread for a living; it now frames an unmarried woman as left over.",
+   "sources": [
+    {
+     "title": "Wiktionary: spinster",
+     "url": "https://en.wiktionary.org/wiki/spinster#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "harpy",
+   "word": "harpy",
+   "forms": [
+    "harpy",
+    "harpies"
+   ],
+   "heat": 2,
+   "category": "gendered",
+   "neutral_swap": "harsh critic",
+   "alternatives": [
+    "harsh critic",
+    "demanding person",
+    "critic"
+   ],
+   "false_friends": [],
+   "origin": "Greek harpyia, 'snatcher', from harpazein, 'to snatch'",
+   "why_it_lands": "From the Greek for 'snatcher'; as an insult it is aimed at women, painting a forceful woman as a predator.",
+   "sources": [
+    {
+     "title": "Wiktionary: harpy",
+     "url": "https://en.wiktionary.org/wiki/harpy#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "shrew",
+   "word": "shrew",
+   "forms": [
+    "shrew",
+    "shrews",
+    "shrewish"
+   ],
+   "heat": 2,
+   "category": "gendered",
+   "neutral_swap": "blunt person",
+   "alternatives": [
+    "blunt person",
+    "outspoken person",
+    "critic"
+   ],
+   "false_friends": [
+    "shrewd",
+    "shrewdly"
+   ],
+   "origin": "Old English screawa, 'shrew'; Middle English schrewe also meant 'wicked person'",
+   "why_it_lands": "Brands an outspoken woman as a nag by comparing her to a small, sharp-toothed animal.",
+   "sources": [
+    {
+     "title": "Wiktionary: shrew",
+     "url": "https://en.wiktionary.org/wiki/shrew#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "sissy",
+   "word": "sissy",
+   "forms": [
+    "sissy",
+    "sissies",
+    "sissified"
+   ],
+   "heat": 2,
+   "category": "gendered",
+   "neutral_swap": "cautious",
+   "alternatives": [
+    "cautious",
+    "timid",
+    "gentle",
+    "sensitive"
+   ],
+   "false_friends": [],
+   "origin": "Short for 'sister' + -y",
+   "why_it_lands": "Literally 'little sister'; it insults boys and men by calling them girlish, implying that feminine means weak.",
+   "sources": [
+    {
+     "title": "Wiktionary: sissy",
+     "url": "https://en.wiktionary.org/wiki/sissy#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "effeminate",
+   "word": "effeminate",
+   "forms": [
+    "effeminate"
+   ],
+   "heat": 2,
+   "category": "gendered",
+   "neutral_swap": "gentle",
+   "alternatives": [
+    "gentle",
+    "soft-spoken",
+    "graceful"
+   ],
+   "false_friends": [],
+   "origin": "Latin effeminatus, from femina, 'woman'",
+   "why_it_lands": "Built on Latin 'femina' (woman); it criticises a man by comparing him to a woman.",
+   "sources": [
+    {
+     "title": "Wiktionary: effeminate",
+     "url": "https://en.wiktionary.org/wiki/effeminate#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "wench",
+   "word": "wench",
+   "forms": [
+    "wench",
+    "wenches"
+   ],
+   "heat": 2,
+   "category": "gendered",
+   "neutral_swap": "woman",
+   "alternatives": [
+    "woman",
+    "young woman",
+    "server"
+   ],
+   "false_friends": [],
+   "origin": "Middle English wenchel, 'child, girl'; Old English wencel, 'child, servant, slave'",
+   "why_it_lands": "Once meant a girl or servant; it later picked up 'loose woman' senses, so it now reads as degrading.",
+   "sources": [
+    {
+     "title": "Wiktionary: wench",
+     "url": "https://en.wiktionary.org/wiki/wench#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "harridan",
+   "word": "harridan",
+   "forms": [
+    "harridan",
+    "harridans"
+   ],
+   "heat": 2,
+   "category": "gendered",
+   "neutral_swap": "stern person",
+   "alternatives": [
+    "stern person",
+    "strict person",
+    "critic"
+   ],
+   "false_friends": [],
+   "origin": "Possibly from French haridelle, 'old horse, nag' (uncertain)",
+   "why_it_lands": "Possibly from the French for a worn-out horse; it mocks older women as bossy and bad-tempered.",
+   "sources": [
+    {
+     "title": "Wiktionary: harridan",
+     "url": "https://en.wiktionary.org/wiki/harridan#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "gyp",
+   "word": "gyp",
+   "forms": [
+    "gyp",
+    "gypped",
+    "gypping",
+    "gyps",
+    "jip",
+    "jipped"
+   ],
+   "heat": 2,
+   "category": "ethnic",
+   "neutral_swap": "cheated",
+   "alternatives": [
+    "cheated",
+    "ripped off",
+    "shortchanged",
+    "swindled"
+   ],
+   "false_friends": [
+    "gypsum",
+    "gypsophila",
+    "Egypt"
+   ],
+   "origin": "Probably from 'Gypsy', a term for the Roma; disputed (some propose 'dupe')",
+   "why_it_lands": "Likely shortened from 'Gypsy', tying cheating to the Romani people, which is why many Romani hear it as a slur.",
+   "sources": [
+    {
+     "title": "Wiktionary: gyp",
+     "url": "https://en.wiktionary.org/wiki/gyp#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "welsh",
+   "word": "welsh",
+   "forms": [
+    "welsh",
+    "welshed",
+    "welshing",
+    "welsher",
+    "welch",
+    "welched",
+    "welching"
+   ],
+   "heat": 2,
+   "category": "ethnic",
+   "neutral_swap": "back out",
+   "alternatives": [
+    "back out",
+    "renege",
+    "default",
+    "skip out on"
+   ],
+   "false_friends": [
+    "Welsh",
+    "Welshman",
+    "Welsh rarebit"
+   ],
+   "origin": "Disputed: often linked to stereotypes about the Welsh, but firm evidence is lacking",
+   "why_it_lands": "Widely heard as a jab at Welsh people, even though etymologists can't prove the link; 'renege' avoids the question.",
+   "sources": [
+    {
+     "title": "Wiktionary: welsh",
+     "url": "https://en.wiktionary.org/wiki/welsh#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "paddy-wagon",
+   "word": "paddy wagon",
+   "forms": [
+    "paddy wagon",
+    "paddy wagons",
+    "paddywagon"
+   ],
+   "heat": 2,
+   "category": "ethnic",
+   "neutral_swap": "police van",
+   "alternatives": [
+    "police van",
+    "patrol wagon"
+   ],
+   "false_friends": [],
+   "origin": "Supposedly from 'Paddy', a derogatory name for an Irishman",
+   "why_it_lands": "Supposedly named for 'Paddy', an old slur for Irishmen, so it keeps an ethnic stereotype inside an everyday phrase.",
+   "sources": [
+    {
+     "title": "Wiktionary: paddy wagon",
+     "url": "https://en.wiktionary.org/wiki/paddy_wagon#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "indian-giver",
+   "word": "Indian giver",
+   "forms": [
+    "Indian giver",
+    "Indian givers",
+    "Indian giving"
+   ],
+   "heat": 2,
+   "category": "ethnic",
+   "neutral_swap": "takes back a gift",
+   "alternatives": [
+    "takes back a gift",
+    "goes back on a gift",
+    "takes it back"
+   ],
+   "false_friends": [],
+   "origin": "Said to come from Lewis and Clark misreading Native American trading customs",
+   "why_it_lands": "Turns a misunderstanding of Native American trade into a label for dishonesty.",
+   "sources": [
+    {
+     "title": "Wiktionary: Indian giving",
+     "url": "https://en.wiktionary.org/wiki/Indian_giving#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "barbarian",
+   "word": "barbarian",
+   "forms": [
+    "barbarian",
+    "barbarians",
+    "barbaric",
+    "barbarous"
+   ],
+   "heat": 1,
+   "category": "ethnic",
+   "neutral_swap": "brute",
+   "alternatives": [
+    "brute",
+    "rude person",
+    "uncivil"
+   ],
+   "false_friends": [],
+   "origin": "Greek barbaros, 'foreign, non-Greek', possibly imitating foreign speech",
+   "why_it_lands": "First meant anyone who wasn't Greek; it still carries the idea that outsiders are uncivilised.",
+   "sources": [
+    {
+     "title": "Wiktionary: barbarian",
+     "url": "https://en.wiktionary.org/wiki/barbarian#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "vandal",
+   "word": "vandal",
+   "forms": [
+    "vandal",
+    "vandals",
+    "vandalize",
+    "vandalise",
+    "vandalism",
+    "vandalized",
+    "vandalised"
+   ],
+   "heat": 0,
+   "category": "ethnic",
+   "neutral_swap": "damage",
+   "alternatives": [
+    "damage",
+    "deface",
+    "wreck"
+   ],
+   "false_friends": [],
+   "origin": "From the Vandals, a Germanic people blamed for the sack of Rome in 455",
+   "why_it_lands": "Names a whole people after one sack of Rome; they may have been no more destructive than other invaders.",
+   "sources": [
+    {
+     "title": "Wiktionary: vandal",
+     "url": "https://en.wiktionary.org/wiki/vandal#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "bugger",
+   "word": "bugger",
+   "forms": [
+    "bugger",
+    "buggers",
+    "buggered",
+    "buggery"
+   ],
+   "heat": 2,
+   "category": "ethnic",
+   "neutral_swap": "pest",
+   "alternatives": [
+    "pest",
+    "rascal",
+    "nuisance"
+   ],
+   "false_friends": [
+    "debugger",
+    "debugging"
+   ],
+   "origin": "Medieval Latin Bulgarus, 'Bulgarian', a label for heretics",
+   "why_it_lands": "Began as a slur for Bulgarian heretics accused of forbidden sex; it is still crude in British usage.",
+   "sources": [
+    {
+     "title": "Wiktionary: bugger",
+     "url": "https://en.wiktionary.org/wiki/bugger#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "shyster",
+   "word": "shyster",
+   "forms": [
+    "shyster",
+    "shysters"
+   ],
+   "heat": 1,
+   "category": "ethnic",
+   "neutral_swap": "crooked lawyer",
+   "alternatives": [
+    "crooked lawyer",
+    "swindler",
+    "con artist"
+   ],
+   "false_friends": [],
+   "origin": "Disputed: possibly 'shy' (disreputable) + -ster, or German Scheisser; not related to Shylock",
+   "why_it_lands": "Often assumed to be antisemitic, but it has no link to Shylock; the real origin is uncertain.",
+   "sources": [
+    {
+     "title": "Wiktionary: shyster",
+     "url": "https://en.wiktionary.org/wiki/shyster#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "grandfathered",
+   "word": "grandfathered",
+   "forms": [
+    "grandfathered",
+    "grandfathered in",
+    "grandfather clause",
+    "grandfathering"
+   ],
+   "heat": 1,
+   "category": "ethnic",
+   "neutral_swap": "exempted",
+   "alternatives": [
+    "exempted",
+    "legacy",
+    "carried over",
+    "exempt under old rules"
+   ],
+   "false_friends": [],
+   "origin": "From post-Civil War Southern voting laws that exempted men whose grandfathers could vote",
+   "why_it_lands": "Comes from laws built to keep Black Americans from voting while sparing poor white voters.",
+   "sources": [
+    {
+     "title": "Wiktionary: grandfather clause",
+     "url": "https://en.wiktionary.org/wiki/grandfather_clause#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "sold-down-the-river",
+   "word": "sold down the river",
+   "forms": [
+    "sold down the river",
+    "sell down the river",
+    "sells down the river",
+    "selling down the river"
+   ],
+   "heat": 2,
+   "category": "ethnic",
+   "neutral_swap": "betrayed",
+   "alternatives": [
+    "betrayed",
+    "let down",
+    "abandoned",
+    "double-crossed"
+   ],
+   "false_friends": [],
+   "origin": "Probably from the US slave trade shipping enslaved people down the Mississippi",
+   "why_it_lands": "Probably recalls enslaved people being sold and shipped down the Mississippi, a grim origin for an everyday idiom.",
+   "sources": [
+    {
+     "title": "Wiktionary: sell down the river",
+     "url": "https://en.wiktionary.org/wiki/sell_down_the_river#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "cakewalk",
+   "word": "cakewalk",
+   "forms": [
+    "cakewalk",
+    "cake walk",
+    "cakewalks"
+   ],
+   "heat": 1,
+   "category": "ethnic",
+   "neutral_swap": "easy win",
+   "alternatives": [
+    "easy win",
+    "breeze",
+    "walk in the park",
+    "easy task"
+   ],
+   "false_friends": [],
+   "origin": "From an African-American dance contest, with cake as the prize",
+   "why_it_lands": "Began as a dance by enslaved people mocking slaveowners' ballroom style; the 'easy' sense hides that history.",
+   "sources": [
+    {
+     "title": "Wiktionary: cakewalk",
+     "url": "https://en.wiktionary.org/wiki/cakewalk#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "thug",
+   "word": "thug",
+   "forms": [
+    "thug",
+    "thugs",
+    "thuggish",
+    "thuggery"
+   ],
+   "heat": 2,
+   "category": "ethnic",
+   "neutral_swap": "attacker",
+   "alternatives": [
+    "attacker",
+    "violent criminal",
+    "bully"
+   ],
+   "false_friends": [],
+   "origin": "Hindi thag, 'swindler'; via the Thuggee gangs of colonial India",
+   "why_it_lands": "Borrowed in colonial India; some listeners now hear it as coded language when it's aimed at Black people.",
+   "sources": [
+    {
+     "title": "Wiktionary: thug",
+     "url": "https://en.wiktionary.org/wiki/thug#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "uppity",
+   "word": "uppity",
+   "forms": [
+    "uppity",
+    "uppitiness"
+   ],
+   "heat": 2,
+   "category": "ethnic",
+   "neutral_swap": "arrogant",
+   "alternatives": [
+    "arrogant",
+    "presumptuous",
+    "overconfident"
+   ],
+   "false_friends": [],
+   "origin": "From 'up' + -ed + -y; first recorded around 1880 in 'Uncle Remus'",
+   "why_it_lands": "First recorded in 'Uncle Remus' dialect stories; aimed at Black people, many hear it as 'forgot your place'.",
+   "sources": [
+    {
+     "title": "Wiktionary: uppity",
+     "url": "https://en.wiktionary.org/wiki/uppity#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "oriental",
+   "word": "Oriental",
+   "forms": [
+    "Oriental",
+    "oriental",
+    "Orientals"
+   ],
+   "heat": 2,
+   "category": "ethnic",
+   "neutral_swap": "Asian",
+   "alternatives": [
+    "Asian",
+    "East Asian",
+    "(name the country)"
+   ],
+   "false_friends": [
+    "Oriental rug",
+    "oriental rug",
+    "orientation",
+    "orient"
+   ],
+   "origin": "Latin orientalis, 'eastern', from oriens, 'rising (sun)'",
+   "why_it_lands": "Describes people from Europe's point of view ('the East'); for people, 'Asian' or the specific country is preferred.",
+   "sources": [
+    {
+     "title": "Wiktionary: Oriental",
+     "url": "https://en.wiktionary.org/wiki/Oriental#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "hooligan",
+   "word": "hooligan",
+   "forms": [
+    "hooligan",
+    "hooligans",
+    "hooliganism"
+   ],
+   "heat": 1,
+   "category": "ethnic",
+   "neutral_swap": "troublemaker",
+   "alternatives": [
+    "troublemaker",
+    "rowdy",
+    "vandal"
+   ],
+   "false_friends": [],
+   "origin": "Probably from the Irish surname Houlihan (1890s)",
+   "why_it_lands": "Probably from an Irish surname, quietly linking rowdiness with Irish people.",
+   "sources": [
+    {
+     "title": "Wiktionary: hooligan",
+     "url": "https://en.wiktionary.org/wiki/hooligan#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "lame",
+   "word": "lame",
+   "forms": [
+    "lame",
+    "lamer",
+    "lamest",
+    "lamely"
+   ],
+   "heat": 1,
+   "category": "disability",
+   "neutral_swap": "dull",
+   "alternatives": [
+    "dull",
+    "weak",
+    "disappointing",
+    "boring"
+   ],
+   "false_friends": [
+    "lamé",
+    "lame duck"
+   ],
+   "origin": "Old English lama, 'unable to walk properly'",
+   "why_it_lands": "Its first meaning is a disability affecting walking, so using it for 'boring' turns that disability into the put-down.",
+   "sources": [
+    {
+     "title": "Wiktionary: lame",
+     "url": "https://en.wiktionary.org/wiki/lame#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "crazy",
+   "word": "crazy",
+   "forms": [
+    "crazy",
+    "crazier",
+    "craziest",
+    "crazed"
+   ],
+   "heat": 1,
+   "category": "disability",
+   "neutral_swap": "wild",
+   "alternatives": [
+    "wild",
+    "unbelievable",
+    "ridiculous",
+    "surprising"
+   ],
+   "false_friends": [],
+   "origin": "From 'craze', 'to crack, crush', + -y",
+   "why_it_lands": "Literally 'cracked'; used for people, it treats mental illness as a punchline or a dismissal.",
+   "sources": [
+    {
+     "title": "Wiktionary: crazy",
+     "url": "https://en.wiktionary.org/wiki/crazy#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "insane",
+   "word": "insane",
+   "forms": [
+    "insane",
+    "insanely",
+    "insanity"
+   ],
+   "heat": 1,
+   "category": "disability",
+   "neutral_swap": "unbelievable",
+   "alternatives": [
+    "unbelievable",
+    "extreme",
+    "ridiculous",
+    "outrageous"
+   ],
+   "false_friends": [],
+   "origin": "Latin insanus, 'unsound in mind', from in- + sanus, 'sound'",
+   "why_it_lands": "Latin for 'not sound of mind'; as casual emphasis it leans on mental illness to mean 'unreasonable'.",
+   "sources": [
+    {
+     "title": "Wiktionary: insane",
+     "url": "https://en.wiktionary.org/wiki/insane#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "cretin",
+   "word": "cretin",
+   "forms": [
+    "cretin",
+    "cretins",
+    "cretinous"
+   ],
+   "heat": 3,
+   "category": "disability",
+   "neutral_swap": "mistaken",
+   "alternatives": [
+    "mistaken",
+    "careless",
+    "uninformed"
+   ],
+   "false_friends": [],
+   "origin": "French crétin, from Alpine dialect crestin, 'Christian' in the sense 'poor fellow'",
+   "why_it_lands": "Once a medical label for people with congenital hypothyroidism; it comes from a word for 'Christian', meaning 'poor soul'.",
+   "sources": [
+    {
+     "title": "Wiktionary: cretin",
+     "url": "https://en.wiktionary.org/wiki/cretin#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "spaz",
+   "word": "spaz",
+   "forms": [
+    "spaz",
+    "spazz",
+    "spazzing",
+    "spazzed",
+    "spazzes",
+    "spastic"
+   ],
+   "heat": 3,
+   "category": "disability",
+   "neutral_swap": "clumsy",
+   "alternatives": [
+    "clumsy",
+    "jittery",
+    "flustered",
+    "overexcited"
+   ],
+   "false_friends": [],
+   "origin": "Short for 'spastic', from Greek spastikos, 'drawing in'",
+   "why_it_lands": "Short for 'spastic'; in the UK, Ireland and Australia it is highly offensive, heard as a jab at cerebral palsy.",
+   "sources": [
+    {
+     "title": "Wiktionary: spaz",
+     "url": "https://en.wiktionary.org/wiki/spaz#English"
+    },
+    {
+     "title": "Wiktionary: spastic",
+     "url": "https://en.wiktionary.org/wiki/spastic#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "dumb",
+   "word": "dumb",
+   "forms": [
+    "dumb",
+    "dumber",
+    "dumbest",
+    "dumbed down"
+   ],
+   "heat": 1,
+   "category": "disability",
+   "neutral_swap": "unwise",
+   "alternatives": [
+    "unwise",
+    "silly",
+    "pointless",
+    "ill-advised"
+   ],
+   "false_friends": [
+    "dumbbell",
+    "dumbwaiter",
+    "dumbfounded",
+    "dumbstruck"
+   ],
+   "origin": "Old English dumb, 'silent, unable to speak'",
+   "why_it_lands": "Meant 'unable to speak' for centuries; the 'stupid' sense became regular only in the 1800s, linking speech loss with low intelligence.",
+   "sources": [
+    {
+     "title": "Wiktionary: dumb",
+     "url": "https://en.wiktionary.org/wiki/dumb#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en",
+   "cross_lang": [
+    {
+     "lang": "de",
+     "word": "dumm",
+     "note": "also first meant 'mute'"
+    },
+    {
+     "lang": "nl",
+     "word": "dom",
+     "note": "also first meant 'mute'"
+    }
+   ]
+  },
+  {
+   "id": "idiot",
+   "word": "idiot",
+   "forms": [
+    "idiot",
+    "idiots",
+    "idiotic",
+    "idiocy"
+   ],
+   "heat": 2,
+   "category": "disability",
+   "neutral_swap": "mistaken",
+   "alternatives": [
+    "mistaken",
+    "careless",
+    "uninformed"
+   ],
+   "false_friends": [],
+   "origin": "Greek idiotes, 'private person, layman'",
+   "why_it_lands": "From Greek for a private, unskilled person; it later became a medical term for severe intellectual disability before turning insult.",
+   "sources": [
+    {
+     "title": "Wiktionary: idiot",
+     "url": "https://en.wiktionary.org/wiki/idiot#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "moron",
+   "word": "moron",
+   "forms": [
+    "moron",
+    "morons",
+    "moronic"
+   ],
+   "heat": 2,
+   "category": "disability",
+   "neutral_swap": "mistaken",
+   "alternatives": [
+    "mistaken",
+    "careless",
+    "uninformed"
+   ],
+   "false_friends": [],
+   "origin": "Coined in 1910 from Greek moros, 'foolish, dull'",
+   "why_it_lands": "Coined in 1910 as a psychology category for mild intellectual disability, before it became an everyday insult.",
+   "sources": [
+    {
+     "title": "Wiktionary: moron",
+     "url": "https://en.wiktionary.org/wiki/moron#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "imbecile",
+   "word": "imbecile",
+   "forms": [
+    "imbecile",
+    "imbeciles",
+    "imbecilic"
+   ],
+   "heat": 2,
+   "category": "disability",
+   "neutral_swap": "mistaken",
+   "alternatives": [
+    "mistaken",
+    "careless",
+    "uninformed"
+   ],
+   "false_friends": [],
+   "origin": "Latin imbecillus, 'weak, feeble', literally 'without a staff'",
+   "why_it_lands": "Latin for 'weak'; it was once a medical grade of limited mental capacity, so the insult draws on disability.",
+   "sources": [
+    {
+     "title": "Wiktionary: imbecile",
+     "url": "https://en.wiktionary.org/wiki/imbecile#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "retarded",
+   "word": "retarded",
+   "forms": [
+    "retarded",
+    "retard",
+    "retards"
+   ],
+   "heat": 3,
+   "category": "disability",
+   "neutral_swap": "ridiculous",
+   "alternatives": [
+    "ridiculous",
+    "pointless",
+    "poorly thought out"
+   ],
+   "false_friends": [
+    "retardant",
+    "flame retardant",
+    "retardation (physics)"
+   ],
+   "origin": "Latin retardare, 'to slow down', from tardus, 'slow'",
+   "why_it_lands": "From Latin for 'slowed'; after decades as a clinical term, its insult use is labelled derogatory and offensive.",
+   "sources": [
+    {
+     "title": "Wiktionary: retard",
+     "url": "https://en.wiktionary.org/wiki/retard#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "lunatic",
+   "word": "lunatic",
+   "forms": [
+    "lunatic",
+    "lunatics",
+    "lunacy"
+   ],
+   "heat": 1,
+   "category": "disability",
+   "neutral_swap": "reckless",
+   "alternatives": [
+    "reckless",
+    "erratic",
+    "wild"
+   ],
+   "false_friends": [],
+   "origin": "Late Latin lunaticus, 'moonstruck', from luna, 'moon'",
+   "why_it_lands": "From the old belief that the moon's phases caused madness; it turns mental illness into an insult.",
+   "sources": [
+    {
+     "title": "Wiktionary: lunatic",
+     "url": "https://en.wiktionary.org/wiki/lunatic#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "bedlam",
+   "word": "bedlam",
+   "forms": [
+    "bedlam"
+   ],
+   "heat": 0,
+   "category": "disability",
+   "neutral_swap": "chaos",
+   "alternatives": [
+    "chaos",
+    "uproar",
+    "mayhem"
+   ],
+   "false_friends": [],
+   "origin": "From 'Bedlam', London's Bethlem Royal Hospital, a lunatic asylum",
+   "why_it_lands": "Named after London's old asylum; most people use it without knowing, and it rarely offends.",
+   "sources": [
+    {
+     "title": "Wiktionary: bedlam",
+     "url": "https://en.wiktionary.org/wiki/bedlam#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "psycho",
+   "word": "psycho",
+   "forms": [
+    "psycho",
+    "psychos"
+   ],
+   "heat": 2,
+   "category": "disability",
+   "neutral_swap": "volatile",
+   "alternatives": [
+    "volatile",
+    "erratic",
+    "frightening"
+   ],
+   "false_friends": [],
+   "origin": "Short for 'psychotic' or 'psychopath'",
+   "why_it_lands": "Shortens two clinical terms into an insult, blurring mental illness with danger.",
+   "sources": [
+    {
+     "title": "Wiktionary: psycho",
+     "url": "https://en.wiktionary.org/wiki/psycho#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "crippling",
+   "word": "crippling",
+   "forms": [
+    "crippling",
+    "crippled",
+    "cripple",
+    "cripples"
+   ],
+   "heat": 2,
+   "category": "disability",
+   "neutral_swap": "severe",
+   "alternatives": [
+    "severe",
+    "overwhelming",
+    "devastating",
+    "heavy"
+   ],
+   "false_friends": [],
+   "origin": "Old English crypel, related to 'creep': 'tending to crawl'",
+   "why_it_lands": "From a word for someone who crawls; as a metaphor ('crippling debt') it uses disability as shorthand for ruin.",
+   "sources": [
+    {
+     "title": "Wiktionary: cripple",
+     "url": "https://en.wiktionary.org/wiki/cripple#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en",
+   "cross_lang": [
+    {
+     "lang": "de",
+     "word": "Krüppel",
+     "note": "same Germanic root"
+    }
+   ]
+  },
+  {
+   "id": "stupid",
+   "word": "stupid",
+   "forms": [
+    "stupid",
+    "stupidity",
+    "stupidly"
+   ],
+   "heat": 1,
+   "category": "disability",
+   "neutral_swap": "unwise",
+   "alternatives": [
+    "unwise",
+    "careless",
+    "short-sighted"
+   ],
+   "false_friends": [],
+   "origin": "Latin stupidus, 'struck senseless, amazed'",
+   "why_it_lands": "Originally 'stunned' in Latin; it's mild, but aimed at a person it shifts the talk from the idea to them.",
+   "sources": [
+    {
+     "title": "Wiktionary: stupid",
+     "url": "https://en.wiktionary.org/wiki/stupid#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "maniac",
+   "word": "maniac",
+   "forms": [
+    "maniac",
+    "maniacs",
+    "maniacal"
+   ],
+   "heat": 1,
+   "category": "disability",
+   "neutral_swap": "enthusiast",
+   "alternatives": [
+    "enthusiast",
+    "fanatic",
+    "reckless"
+   ],
+   "false_friends": [],
+   "origin": "Greek maniakos, from mania, 'madness'",
+   "why_it_lands": "From the Greek for madness; it borrows mental illness for anyone wild, reckless or obsessive.",
+   "sources": [
+    {
+     "title": "Wiktionary: maniac",
+     "url": "https://en.wiktionary.org/wiki/maniac#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "crusade",
+   "word": "crusade",
+   "forms": [
+    "crusade",
+    "crusades",
+    "crusader",
+    "crusading"
+   ],
+   "heat": 1,
+   "category": "religious",
+   "neutral_swap": "campaign",
+   "alternatives": [
+    "campaign",
+    "drive",
+    "push",
+    "effort"
+   ],
+   "false_friends": [],
+   "origin": "French croisade, from Medieval Latin cruciata, 'marked with the cross'",
+   "why_it_lands": "Names the medieval holy wars; for Muslim and Jewish listeners a 'crusade' can recall invasion rather than a noble cause.",
+   "sources": [
+    {
+     "title": "Wiktionary: crusade",
+     "url": "https://en.wiktionary.org/wiki/crusade#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "heathen",
+   "word": "heathen",
+   "forms": [
+    "heathen",
+    "heathens",
+    "heathenish"
+   ],
+   "heat": 1,
+   "category": "religious",
+   "neutral_swap": "nonbeliever",
+   "alternatives": [
+    "nonreligious",
+    "nonbeliever",
+    "outsider"
+   ],
+   "false_friends": [],
+   "origin": "Old English haethen; usually explained as heath + -en",
+   "why_it_lands": "Probably 'person of the heath'; it lumps outsiders to a faith together as uncivilised.",
+   "sources": [
+    {
+     "title": "Wiktionary: heathen",
+     "url": "https://en.wiktionary.org/wiki/heathen#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en",
+   "cross_lang": [
+    {
+     "lang": "de",
+     "word": "Heiden",
+     "note": "cognate"
+    }
+   ]
+  },
+  {
+   "id": "pagan",
+   "word": "pagan",
+   "forms": [
+    "pagan",
+    "pagans",
+    "paganism"
+   ],
+   "heat": 1,
+   "category": "religious",
+   "neutral_swap": "polytheist",
+   "alternatives": [
+    "polytheist",
+    "non-Christian",
+    "nonbeliever"
+   ],
+   "false_friends": [],
+   "origin": "Latin paganus, 'rural, rustic; civilian'",
+   "why_it_lands": "Meant 'country person' in Latin before Christians used it for non-Christians; many neopagans now use it proudly.",
+   "sources": [
+    {
+     "title": "Wiktionary: pagan",
+     "url": "https://en.wiktionary.org/wiki/pagan#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "infidel",
+   "word": "infidel",
+   "forms": [
+    "infidel",
+    "infidels"
+   ],
+   "heat": 2,
+   "category": "religious",
+   "neutral_swap": "nonbeliever",
+   "alternatives": [
+    "nonbeliever",
+    "person of another faith",
+    "outsider"
+   ],
+   "false_friends": [],
+   "origin": "Latin infidelis, 'unfaithful'",
+   "why_it_lands": "Literally 'unfaithful'; it labels people of another faith as traitors to the truth and often appears in hostile rhetoric.",
+   "sources": [
+    {
+     "title": "Wiktionary: infidel",
+     "url": "https://en.wiktionary.org/wiki/infidel#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "hocus-pocus",
+   "word": "hocus-pocus",
+   "forms": [
+    "hocus-pocus",
+    "hocus pocus"
+   ],
+   "heat": 0,
+   "category": "religious",
+   "neutral_swap": "trickery",
+   "alternatives": [
+    "trickery",
+    "nonsense",
+    "sleight of hand"
+   ],
+   "false_friends": [],
+   "origin": "Mock-Latin conjurers' patter; the idea that it mocks the Mass ('hoc est corpus') was a 17th-century suggestion",
+   "why_it_lands": "A stage magician's fake Latin; an archbishop later claimed it mocked Catholic communion words, so some still hear a jab.",
+   "sources": [
+    {
+     "title": "Wiktionary: hocus-pocus",
+     "url": "https://en.wiktionary.org/wiki/hocus-pocus#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "philistine",
+   "word": "philistine",
+   "forms": [
+    "philistine",
+    "philistines",
+    "philistinism"
+   ],
+   "heat": 1,
+   "category": "religious",
+   "neutral_swap": "uncultured",
+   "alternatives": [
+    "uncultured",
+    "unartistic",
+    "indifferent to art"
+   ],
+   "false_friends": [],
+   "origin": "From the Philistines of the Bible, via German student slang Philister",
+   "why_it_lands": "Turns an ancient people of the Bible into a byword for 'uncultured'; mild today, but still a sneer.",
+   "sources": [
+    {
+     "title": "Wiktionary: philistine",
+     "url": "https://en.wiktionary.org/wiki/philistine#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "deadline",
+   "word": "deadline",
+   "forms": [
+    "deadline",
+    "deadlines"
+   ],
+   "heat": 0,
+   "category": "violent",
+   "neutral_swap": "due date",
+   "alternatives": [
+    "due date",
+    "cutoff",
+    "target date"
+   ],
+   "false_friends": [],
+   "origin": "Disputed: possibly from Civil War prison camps' 'dead line'; evidence is only indirect",
+   "why_it_lands": "Often traced to a prison-camp line guards shot across, but evidence is indirect; nearly everyone uses it harmlessly.",
+   "sources": [
+    {
+     "title": "Wiktionary: deadline",
+     "url": "https://en.wiktionary.org/wiki/deadline#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "decimate",
+   "word": "decimate",
+   "forms": [
+    "decimate",
+    "decimated",
+    "decimating",
+    "decimation"
+   ],
+   "heat": 0,
+   "category": "violent",
+   "neutral_swap": "sharply reduce",
+   "alternatives": [
+    "sharply reduce",
+    "cut deeply",
+    "devastate"
+   ],
+   "false_friends": [],
+   "origin": "Latin decimare, 'to kill one in ten'",
+   "why_it_lands": "Latin for killing one in ten; used loosely, it brings violent imagery to talk of cuts and losses.",
+   "sources": [
+    {
+     "title": "Wiktionary: decimate",
+     "url": "https://en.wiktionary.org/wiki/decimate#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "blitz",
+   "word": "blitz",
+   "forms": [
+    "blitz",
+    "blitzed",
+    "blitzing"
+   ],
+   "heat": 0,
+   "category": "violent",
+   "neutral_swap": "push",
+   "alternatives": [
+    "push",
+    "rush",
+    "burst",
+    "all-out effort"
+   ],
+   "false_friends": [],
+   "origin": "Short for German Blitzkrieg, 'lightning war'",
+   "why_it_lands": "Short for Blitzkrieg, a military term for 'lightning war'; in sports and marketing the echo is usually faint.",
+   "sources": [
+    {
+     "title": "Wiktionary: blitz",
+     "url": "https://en.wiktionary.org/wiki/blitz#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "go-postal",
+   "word": "go postal",
+   "forms": [
+    "go postal",
+    "went postal",
+    "going postal",
+    "goes postal"
+   ],
+   "heat": 2,
+   "category": "violent",
+   "neutral_swap": "lose my temper",
+   "alternatives": [
+    "lose my temper",
+    "snap",
+    "blow up"
+   ],
+   "false_friends": [],
+   "origin": "From 1980s shootings by disgruntled US Postal Service workers",
+   "why_it_lands": "Refers to real workplace shootings, so the joke can land hard on people touched by gun violence.",
+   "sources": [
+    {
+     "title": "Wiktionary: go postal",
+     "url": "https://en.wiktionary.org/wiki/go_postal#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "amok",
+   "word": "amok",
+   "forms": [
+    "amok",
+    "amuck",
+    "run amok",
+    "running amok",
+    "ran amok"
+   ],
+   "heat": 0,
+   "category": "violent",
+   "neutral_swap": "out of control",
+   "alternatives": [
+    "out of control",
+    "wild",
+    "unchecked"
+   ],
+   "false_friends": [],
+   "origin": "Malay amuk, 'to go on a killing spree', via Portuguese",
+   "why_it_lands": "Borrowed from Malay for a killing frenzy and once tied to the peoples of Malaysia and Java; now usually harmless.",
+   "sources": [
+    {
+     "title": "Wiktionary: amok",
+     "url": "https://en.wiktionary.org/wiki/amok#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "berserk",
+   "word": "berserk",
+   "forms": [
+    "berserk",
+    "berserker"
+   ],
+   "heat": 0,
+   "category": "violent",
+   "neutral_swap": "out of control",
+   "alternatives": [
+    "out of control",
+    "furious",
+    "frantic"
+   ],
+   "false_friends": [],
+   "origin": "Old Norse berserkr, probably 'bear' + 'shirt', a frenzied warrior",
+   "why_it_lands": "Named for Norse warriors who fought in a frenzy, probably wearing bearskins; today it's a mild word.",
+   "sources": [
+    {
+     "title": "Wiktionary: berserk",
+     "url": "https://en.wiktionary.org/wiki/berserk#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "rule-of-thumb",
+   "word": "rule of thumb",
+   "forms": [
+    "rule of thumb",
+    "rules of thumb"
+   ],
+   "heat": 0,
+   "category": "violent",
+   "neutral_swap": "general rule",
+   "alternatives": [
+    "general rule",
+    "guideline",
+    "rough guide"
+   ],
+   "false_friends": [],
+   "origin": "Uncertain; probably the thumb as a rough measure (attested 1658)",
+   "why_it_lands": "The story that it set a legal stick width for wife-beating is false; it's generally safe to use.",
+   "sources": [
+    {
+     "title": "Wiktionary: rule of thumb",
+     "url": "https://en.wiktionary.org/wiki/rule_of_thumb#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "lynch",
+   "word": "lynch",
+   "forms": [
+    "lynch",
+    "lynching",
+    "lynched",
+    "lynch mob"
+   ],
+   "heat": 3,
+   "category": "violent",
+   "neutral_swap": "angry crowd",
+   "alternatives": [
+    "angry crowd",
+    "pile-on",
+    "harsh attack"
+   ],
+   "false_friends": [
+    "Lynch"
+   ],
+   "origin": "From 'Lynch law' (1811); named after either Charles Lynch or William Lynch, disputed",
+   "why_it_lands": "Means a mob killing without trial; used for harsh criticism, it borrows the image of real racial-terror murders.",
+   "sources": [
+    {
+     "title": "Wiktionary: lynch",
+     "url": "https://en.wiktionary.org/wiki/lynch#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "gerrymander",
+   "word": "gerrymander",
+   "forms": [
+    "gerrymander",
+    "gerrymandered",
+    "gerrymandering"
+   ],
+   "heat": 1,
+   "category": "political",
+   "neutral_swap": "redraw districts",
+   "alternatives": [
+    "redraw districts for advantage",
+    "redistrict unfairly",
+    "redraw districts"
+   ],
+   "false_friends": [],
+   "origin": "Blend of Elbridge Gerry + salamander (Boston Gazette, 1812)",
+   "why_it_lands": "Named mocking a governor whose district looked like a salamander; it's precise, but it accuses deliberate cheating.",
+   "sources": [
+    {
+     "title": "Wiktionary: gerrymander",
+     "url": "https://en.wiktionary.org/wiki/gerrymander#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "quisling",
+   "word": "quisling",
+   "forms": [
+    "quisling",
+    "quislings"
+   ],
+   "heat": 2,
+   "category": "political",
+   "neutral_swap": "collaborator",
+   "alternatives": [
+    "collaborator",
+    "defector"
+   ],
+   "false_friends": [],
+   "origin": "After Vidkun Quisling, head of Norway's Nazi-collaborationist government",
+   "why_it_lands": "Named after Norway's wartime Nazi collaborator, so it equates an opponent with a traitor who served the Nazis.",
+   "sources": [
+    {
+     "title": "Wiktionary: quisling",
+     "url": "https://en.wiktionary.org/wiki/quisling#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "propaganda",
+   "word": "propaganda",
+   "forms": [
+    "propaganda"
+   ],
+   "heat": 1,
+   "category": "political",
+   "neutral_swap": "messaging",
+   "alternatives": [
+    "messaging",
+    "spin",
+    "promotion",
+    "advocacy"
+   ],
+   "false_friends": [],
+   "origin": "New Latin, from the Church's Congregation for Propagating the Faith (1622)",
+   "why_it_lands": "Began as the name of a Church missionary committee; it now implies deliberate deception, so it accuses as it describes.",
+   "sources": [
+    {
+     "title": "Wiktionary: propaganda",
+     "url": "https://en.wiktionary.org/wiki/propaganda#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "demagogue",
+   "word": "demagogue",
+   "forms": [
+    "demagogue",
+    "demagogues",
+    "demagoguery"
+   ],
+   "heat": 1,
+   "category": "political",
+   "neutral_swap": "populist",
+   "alternatives": [
+    "populist",
+    "crowd-pleaser"
+   ],
+   "false_friends": [],
+   "origin": "Greek demagogos, 'leader of the people', from demos + agogos",
+   "why_it_lands": "Literally 'leader of the people' in Greek; today it charges that someone manipulates crowds.",
+   "sources": [
+    {
+     "title": "Wiktionary: demagogue",
+     "url": "https://en.wiktionary.org/wiki/demagogue#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "draconian",
+   "word": "draconian",
+   "forms": [
+    "draconian"
+   ],
+   "heat": 0,
+   "category": "political",
+   "neutral_swap": "harsh",
+   "alternatives": [
+    "harsh",
+    "severe",
+    "strict"
+   ],
+   "false_friends": [],
+   "origin": "After Draco, an Athenian lawmaker known for harsh laws",
+   "why_it_lands": "Named for an ancient Athenian lawgiver; mostly a vivid word for 'very harsh', and rarely offensive.",
+   "sources": [
+    {
+     "title": "Wiktionary: draconian",
+     "url": "https://en.wiktionary.org/wiki/draconian#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "witch-hunt",
+   "word": "witch hunt",
+   "forms": [
+    "witch hunt",
+    "witch-hunt",
+    "witch hunts"
+   ],
+   "heat": 1,
+   "category": "political",
+   "neutral_swap": "unfair investigation",
+   "alternatives": [
+    "unfair investigation",
+    "campaign against",
+    "persecution"
+   ],
+   "false_friends": [],
+   "origin": "",
+   "why_it_lands": "As a political charge it frames an inquiry as persecution of the innocent.",
+   "sources": [
+    {
+     "title": "Wiktionary: witch-hunt",
+     "url": "https://en.wiktionary.org/wiki/witch-hunt#English"
+    }
+   ],
+   "status": "draft",
+   "lang": "en"
+  },
+  {
+   "id": "silly",
+   "word": "silly",
+   "forms": [
+    "silly",
+    "sillier",
+    "silliest",
+    "silliness"
+   ],
+   "heat": 0,
+   "category": "drift",
+   "neutral_swap": "playful",
+   "alternatives": [
+    "playful",
+    "goofy",
+    "lighthearted"
+   ],
+   "false_friends": [],
+   "origin": "Old English saelig, 'lucky, fortunate'",
+   "why_it_lands": "Drifted from 'lucky' to 'innocent' to 'naive' to 'foolish'; calling an adult silly can feel belittling.",
+   "sources": [
+    {
+     "title": "Wiktionary: silly",
+     "url": "https://en.wiktionary.org/wiki/silly#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "villain",
+   "word": "villain",
+   "forms": [
+    "villain",
+    "villains",
+    "villainous"
+   ],
+   "heat": 0,
+   "category": "drift",
+   "neutral_swap": "wrongdoer",
+   "alternatives": [
+    "wrongdoer",
+    "antagonist",
+    "culprit"
+   ],
+   "false_friends": [],
+   "origin": "Late Latin villanus, a serf or farmhand bound to a villa",
+   "why_it_lands": "First meant a peasant farmworker; its drift to 'evil person' shows old class prejudice baked into English.",
+   "sources": [
+    {
+     "title": "Wiktionary: villain",
+     "url": "https://en.wiktionary.org/wiki/villain#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en",
+   "cross_lang": [
+    {
+     "lang": "fr",
+     "word": "vilain",
+     "note": "modern descendant of the same word"
+    }
+   ]
+  },
+  {
+   "id": "boor",
+   "word": "boor",
+   "forms": [
+    "boor",
+    "boors",
+    "boorish"
+   ],
+   "heat": 1,
+   "category": "drift",
+   "neutral_swap": "rude person",
+   "alternatives": [
+    "rude person",
+    "impolite",
+    "tactless"
+   ],
+   "false_friends": [],
+   "origin": "Dutch boer, 'peasant, farmer'",
+   "why_it_lands": "Meant 'farmer'; turning 'farmer' into 'rude person' reflects an old city-versus-country sneer.",
+   "sources": [
+    {
+     "title": "Wiktionary: boor",
+     "url": "https://en.wiktionary.org/wiki/boor#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en",
+   "cross_lang": [
+    {
+     "lang": "nl",
+     "word": "boer",
+     "note": "still means 'farmer'"
+    }
+   ]
+  },
+  {
+   "id": "lewd",
+   "word": "lewd",
+   "forms": [
+    "lewd",
+    "lewdly",
+    "lewdness"
+   ],
+   "heat": 1,
+   "category": "drift",
+   "neutral_swap": "crude",
+   "alternatives": [
+    "crude",
+    "indecent",
+    "explicit"
+   ],
+   "false_friends": [],
+   "origin": "Old English laewede, 'unlearned, lay (not clergy)'",
+   "why_it_lands": "Once simply meant 'not clergy' or 'unlearned'; its slide to 'obscene' is a classic example of meaning drift.",
+   "sources": [
+    {
+     "title": "Wiktionary: lewd",
+     "url": "https://en.wiktionary.org/wiki/lewd#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "naughty",
+   "word": "naughty",
+   "forms": [
+    "naughty",
+    "naughtier",
+    "naughtiness"
+   ],
+   "heat": 0,
+   "category": "drift",
+   "neutral_swap": "mischievous",
+   "alternatives": [
+    "mischievous",
+    "cheeky",
+    "misbehaving"
+   ],
+   "false_friends": [],
+   "origin": "From 'naught' + -y; Middle English 'evil, immoral, wicked'",
+   "why_it_lands": "Once meant truly wicked; now it's mostly for children or flirting, which can sound patronising to adults.",
+   "sources": [
+    {
+     "title": "Wiktionary: naughty",
+     "url": "https://en.wiktionary.org/wiki/naughty#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "bully",
+   "word": "bully",
+   "forms": [
+    "bully",
+    "bullies",
+    "bullied",
+    "bullying"
+   ],
+   "heat": 0,
+   "category": "drift",
+   "neutral_swap": "intimidator",
+   "alternatives": [
+    "intimidator",
+    "harasser",
+    "tormentor"
+   ],
+   "false_friends": [],
+   "origin": "Probably Dutch boel, 'lover, brother'; first a term of endearment (1530)",
+   "why_it_lands": "In 1530 it was a term of endearment; its turn toward 'tormentor' is one of English's sharpest meaning reversals.",
+   "sources": [
+    {
+     "title": "Wiktionary: bully",
+     "url": "https://en.wiktionary.org/wiki/bully#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  },
+  {
+   "id": "egregious",
+   "word": "egregious",
+   "forms": [
+    "egregious",
+    "egregiously"
+   ],
+   "heat": 0,
+   "category": "drift",
+   "neutral_swap": "glaring",
+   "alternatives": [
+    "glaring",
+    "flagrant",
+    "serious"
+   ],
+   "false_friends": [],
+   "origin": "Latin egregius, 'standing out from the flock' (e- + grex)",
+   "why_it_lands": "Once praise for someone outstanding; now it's only for bad things, so older texts can read the opposite.",
+   "sources": [
+    {
+     "title": "Wiktionary: egregious",
+     "url": "https://en.wiktionary.org/wiki/egregious#English"
+    }
+   ],
+   "status": "reviewed",
+   "lang": "en"
+  }
+ ]
+}

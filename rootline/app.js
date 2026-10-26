@@ -61,6 +61,7 @@ function go(name, arg, noPush){
   else if(name==="gate") renderGate(arg);
   else if(name==="codex") renderCodex();
   else if(name==="bank" && window.RootlineBank) window.RootlineBank.start();
+  else if(name==="hw" && window.RootlineHW) window.RootlineHW.start();
   window.scrollTo(0,0);
 }
 window.addEventListener("popstate", function(){ if(document.querySelector(".modal")){ closeModal(); return; } go("home",null,true); });
@@ -98,7 +99,7 @@ function renderHome(){
   h += '</div><div style="display:grid;gap:14px"><div class="card"><h3>Free Play</h3><div class="tracks">';
   for(var t in TRACKS){ var cnt = t==="all"?W.length:W.filter(function(w){return w.track===t;}).length;
     h += '<button class="track" data-act="free" data-track="'+t+'"><b>'+TRACKS[t].name+'</b><span>'+TRACKS[t].desc+' · '+cnt+'</span></button>'; }
-  h += '</div></div>'+(window.RootlineBank?window.RootlineBank.homeCard():"")+'<div class="row"><button class="btn" data-act="gates">🔤 Script Gates</button><button class="btn" data-act="codex">📜 Root Codex</button></div></div></div>';
+  h += '</div></div>'+(window.RootlineHW?window.RootlineHW.homeCard():"")+(window.RootlineBank?window.RootlineBank.homeCard():"")+'<div class="row"><button class="btn" data-act="gates">🔤 Script Gates</button><button class="btn" data-act="codex">📜 Root Codex</button></div></div></div>';
   h += '<p class="dim small" style="text-align:center;margin-top:26px">Progress saves on this device. Works offline once loaded. <a href="#" data-act="audiocredits" style="color:var(--gold)">🎧 Audio credits</a><br><a href="https://arcade.noveltie.com/" style="color:var(--gold)">← NovelTie Arcade</a></p>';
   app.innerHTML = h;
 }
