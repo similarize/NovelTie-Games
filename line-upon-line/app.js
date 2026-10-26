@@ -26,7 +26,7 @@
   function shuffle(arr, r) { r = r || R; var a = arr.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(r() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
   function pick(arr, r) { r = r || R; return arr[Math.floor(r() * arr.length)]; }
   var toastT;
-  function toast(msg) { var t = document.querySelector(".toast"); if (!t) { t = document.createElement("div"); t.className = "toast"; document.body.appendChild(t); } t.textContent = msg; t.style.display = "block"; clearTimeout(toastT); toastT = setTimeout(function () { t.style.display = "none"; }, 2200); }
+  function toast(msg) { var t = document.querySelector(".toast"); if (!t) { t = document.createElement("div"); t.className = "toast"; t.onclick = function () { t.style.display = "none"; }; document.body.appendChild(t); } t.textContent = msg; t.style.display = "block"; clearTimeout(toastT); toastT = setTimeout(function () { t.style.display = "none"; }, 2200); }
   function schedule(rec, pass) { rec.box = pass ? Math.min((rec.box || 0) + 1, 5) : 0; rec.due = Date.now() + (rec.box === 0 ? 10 * MIN : INT[rec.box] * DAY); rec.seen = (rec.seen || 0) + 1; }
 
   /* ---------- text grading ---------- */
@@ -134,7 +134,8 @@
     trail: SV('<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>'),
     timer: SV('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/>'),
     book: SV('<path d="M4 5c3-1 6-1 8 1 2-2 5-2 8-1v14c-3-1-6-1-8 1-2-2-5-2-8-1z"/><path d="M12 6v14"/>'),
-    pen: SV('<path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/>')
+    pen: SV('<path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/>'),
+    bridge: SV('<path d="M2 17h20M4 17v-4M20 17v-4M8 17v-6M16 17v-6M12 17V9"/><path d="M2 13c4-5 16-5 20 0"/>')
   };
   function home() {
     var ds = dailyState(), sk = streakNow();
@@ -152,6 +153,7 @@
       '<button class="tile" data-act="triv"><span class="ic">' + IC.timer + '</span><b>Trivia Sprint</b><small>60 seconds. Best: ' + (st.best.trivia || 0) + "</small></button>" +
       '<button class="tile" data-act="dm"><span class="ic">' + IC.book + '</span><b>Doctrinal Mastery</b><small>Seminary passages.' + (dmDue ? " " + dmDue + " due" : "") + "</small></button>" +
       '<button class="tile" data-act="journal"><span class="ic">' + IC.pen + '</span><b>Testimony Journal</b><small>' + st.journal.length + " saved</small></button>" +
+      '<button class="tile wide bridges" data-act="bridges"><span class="ic">' + IC.bridge + '</span><b>Bridges <span class="newtag">Help others</span></b><small>Two taps a passage: pick the explanation that helps you most. Your picks help the next reader, and help Similarize.</small></button>' +
       "</div>" +
       '<div class="foot"><button data-act="timeline">Full timeline</button> · <button data-act="sources">About &amp; sources</button><div>A personal study game · not an official Church product</div></div>';
   }
@@ -378,7 +380,7 @@
   function dmPassage(ref) {
     CURREF = ref; var m = dmByRef(ref), r = st.dm[ref];
     app.innerHTML = topbar(m.ref, lvl(r && r.box)) +
-      '<div class="card stack"><div class="small muted">Key scripture phrase</div><div class="keyp">' + esc(m.key) + '</div><div class="verse">' + versesHTML(m) + '</div><div class="acts" style="display:flex;gap:10px;flex-wrap:wrap"><a class="linkbtn" href="' + esc(m.url) + '" target="_blank" rel="noopener">Read in context ↗</a>' + saveBtn({ text: m.verses.map(function (v) { return v.t; }).join(" "), cite: m.ref, url: m.url }) + "</div></div>" +
+      '<div class="card stack"><div class="small muted">Key scripture phrase</div><div class="keyp">' + esc(m.key) + '</div><div class="verse">' + versesHTML(m) + '</div><div class="acts" style="display:flex;gap:10px;flex-wrap:wrap"><a class="linkbtn" href="' + esc(m.url) + '" target="_blank" rel="noopener">Read in context ↗</a>' + saveBtn({ text: m.verses.map(function (v) { return v.t; }).join(" "), cite: m.ref, url: m.url }) + '<button class="linkbtn" data-act="dmbridge" data-arg="' + esc(m.ref) + '">🌉 Help others understand</button>' + "</div></div>" +
       '<h3 style="margin-top:18px">Practice</h3><div class="stack"><button class="btn primary" data-act="dmmode" data-arg="blanks">Fill the blanks</button><button class="btn" data-act="dmmode" data-arg="letters">First-letter recall</button><button class="btn" data-act="dmmode" data-arg="ref">Which reference?</button></div>';
   }
   var MP = null;
@@ -509,6 +511,189 @@
       order.filter(function (k) { return groups[k]; }).map(function (k) { return '<div class="card srcl" style="margin-top:14px"><h3>' + esc(k) + "</h3>" + groups[k].map(function (s) { return '<a href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(s.label) + "<span>" + esc(s.url) + "</span></a>"; }).join("") + "</div>"; }).join("");
   }
   ACT.reset = function (a, b) { if (b.getAttribute("data-confirm") !== "1") { b.setAttribute("data-confirm", "1"); b.textContent = "Tap again to erase progress (journal is kept)"; return; } var j = st.journal; st.dc = {}; st.dm = {}; st.best = { trivia: 0, hist: 0 }; st.streak = 0; st.lastDone = ""; st.daily = { date: "", step: 0, res: [] }; st.journal = j; save(); toast("Progress reset"); sources(); };
+
+
+  /* ---------- Contribute (Bridges): one-tap insights that help others understand, and help Similarize learn which explanations land ---------- */
+  var CHOSTS = { prod: "https://lineuponline-bank.ben-e22.workers.dev", staging: "https://lineuponline-bank-staging.ben-e22.workers.dev" };
+  /* prod only on games.noveltie.com (prod CORS + Turnstile hostname allow only that); staging everywhere else. ?api= may only pick one of the two bank hosts. */
+  var CAPI = (function () {
+    var d = location.hostname === "games.noveltie.com" ? CHOSTS.prod : CHOSTS.staging;
+    try { var q = (new URLSearchParams(location.search).get("api") || "").replace(/\/$/, ""); if (q === CHOSTS.prod || q === CHOSTS.staging) return q; } catch (e) {}
+    return d;
+  })();
+  function csession() { var s = ""; try { s = localStorage.getItem("lul-session") || ""; if (!s) { var a = new Uint8Array(16); (window.crypto || {}).getRandomValues ? crypto.getRandomValues(a) : a.forEach(function (_, i) { a[i] = Math.random() * 256; }); s = Array.prototype.map.call(a, function (b) { return ("0" + b.toString(16)).slice(-2); }).join(""); localStorage.setItem("lul-session", s); } } catch (e) { s = "anon" + Date.now(); } return s; }
+  var CB = null, CSEEN = {}, CTS = null; /* CTS = {required, site_key} from the last round */
+  var SLOW = "Slow down a moment, then keep going.";
+  function cpost(path, body) { return fetch(CAPI + path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { j.status = r.status; return j; }); }); }
+  /* Turnstile "I'm human" check: once per visit; the 12 h pass from /verify rides on every post.
+     If the check is blocked or never finishes, taps are queued (never silently dropped) and a bar offers Retry. */
+  var tsPassP = null, CQ = [];
+  function tsStored() { try { var o = JSON.parse(sessionStorage.getItem("lul-ts") || "null"); if (o && o.pass && o.exp > Date.now() + 60000) return o.pass; } catch (e) {} return ""; }
+  function tsLoad() {
+    if (window.turnstile) return Promise.resolve(window.turnstile);
+    return new Promise(function (res, rej) {
+      var s = document.createElement("script"); s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"; s.async = true;
+      s.onload = function () { window.turnstile ? res(window.turnstile) : rej(new Error("ts")); }; s.onerror = function () { rej(new Error("ts blocked")); }; document.head.appendChild(s);
+      setTimeout(function () { rej(new Error("ts load timeout")); }, 15000);
+    });
+  }
+  /* the widget lives in its own sheet above the page (never over an answer); it only shows if Cloudflare needs a tap */
+  function tsSheet() {
+    var el = document.getElementById("cbts");
+    if (!el) { el = document.createElement("div"); el.id = "cbts"; el.className = "cbts"; el.innerHTML = '<div class="cbts-card"><p class="small" style="margin:0 0 8px">Quick check that you’re human, then your taps are saved.</p><div class="cbts-w"></div><button class="btn" data-x="notnow" style="margin-top:10px">Not now</button></div>'; document.body.appendChild(el); }
+    return el;
+  }
+  function cbBar(show) {
+    var el = document.getElementById("cbbar");
+    document.documentElement.classList.toggle("cbbar-on", !!show); /* push the page down so ← home and the pill stay tappable */
+    if (!show) { if (el) el.style.display = "none"; return; }
+    if (!el) { el = document.createElement("div"); el.id = "cbbar"; el.className = "cbbar"; document.body.appendChild(el);
+      el.onclick = function (e) { if (e.target.getAttribute("data-x") === "retry") { el.style.display = "none"; cflush(true); } else if (e.target.getAttribute("data-x") === "close") { cbBar(false); } }; }
+    var n = CQ.length;
+    el.innerHTML = '<span>' + (n === 1 ? "1 tap not saved" : n + " taps not saved") + '</span><button class="btn primary" data-x="retry">Retry</button><button class="iconbtn" data-x="close" aria-label="Close">×</button>';
+    el.style.display = "flex";
+  }
+  /* tsFailed: after a failed check, nothing re-checks on its own; only Retry does (taps just queue behind the bar).
+     ask: true only when a tap is waiting; a warm-up that needs a visible tap quietly stands down instead of opening the sheet. */
+  var tsFailed = false, tsId = null;
+  function getPass(fresh, ask) {
+    if (!CTS || !CTS.required) return Promise.resolve("");
+    if (!fresh) { var p = tsStored(); if (p) return Promise.resolve(p); if (tsFailed) return Promise.reject(new Error("ts failed")); if (tsPassP) return tsPassP; }
+    tsFailed = false;
+    try { sessionStorage.removeItem("lul-ts"); } catch (e) {}
+    tsPassP = tsLoad().then(function (ts) {
+      return new Promise(function (res, rej) {
+        var sheet = tsSheet(), w = sheet.querySelector(".cbts-w"), done = false;
+        /* drop the previous, finished widget before a new one (never inside Turnstile's own callbacks) */
+        if (tsId !== null) { try { ts.remove(tsId); } catch (e) {} tsId = null; }
+        w.innerHTML = "";
+        function end(err, pass) { if (done) return; done = true; clearTimeout(tm); sheet.style.display = "none"; err ? rej(err) : res(pass); }
+        sheet.onclick = function (e) { if (e.target.getAttribute("data-x") === "notnow") end(new Error("ts not now")); };
+        var tm = setTimeout(function () { end(new Error("ts timeout")); }, 20000);
+        tsId = ts.render(w, { sitekey: CTS.site_key, appearance: "interaction-only", retry: "never", "refresh-expired": "manual", "refresh-timeout": "manual",
+          "before-interactive-callback": function () {
+            if (!ask) { var e = new Error("ts needs tap"); e.quiet = true; return end(e); }
+            sheet.style.display = "flex"; clearTimeout(tm); tm = setTimeout(function () { end(new Error("ts timeout")); }, 120000);
+          },
+          "after-interactive-callback": function () { sheet.style.display = "none"; },
+          callback: function (tok) {
+            if (done) return;
+            cpost("/v1/contribute/verify", { turnstile: tok, session: csession() }).then(function (j) {
+              if (j.pass) { try { sessionStorage.setItem("lul-ts", JSON.stringify({ pass: j.pass, exp: Date.now() + (j.expires_in || 43200) * 1000 })); } catch (e) {} end(null, j.pass); }
+              else end(new Error("verify " + j.status));
+            }, function (e) { end(e); });
+          },
+          "error-callback": function () { end(new Error("ts error")); return true; },
+          "timeout-callback": function () { end(new Error("ts timeout")); } });
+      });
+    });
+    tsPassP.then(function () { tsPassP = null; }, function (e) { tsPassP = null; if (!e || !e.quiet) tsFailed = true; });
+    return tsPassP;
+  }
+  function csend(path, body, fresh) {
+    /* a tap during warm-up shares the warm-up check; if that stood down because Cloudflare wants a tap, run it again for this tap so the sheet opens */
+    return getPass(fresh, true).catch(function (e) { return e && e.quiet ? getPass(false, true) : Promise.reject(e); }).then(function (pass) { var b = {}; for (var k in body) b[k] = body[k]; if (pass) b.pass = pass; return cpost(path, b); }); }
+  function cpostH(path, body) {
+    return csend(path, body, false).then(function (j) { return j.status === 401 && j.turnstile ? csend(path, body, true) : j; })
+      .then(function (j) {
+        if (j.status === 401 && j.turnstile) { tsFailed = true; throw new Error("ts"); }
+        if (j.status === 429) toast(SLOW);
+        if (CQ.length && j.status === 200) cflush(false);
+        return j;
+      })
+      .catch(function () { CQ.push([path, body]); cbBar(true); });
+  }
+  function cflush(fresh) {
+    var q = CQ; CQ = []; cbBar(false); if (!q.length) return;
+    var first = q[0];
+    csend(first[0], first[1], fresh).then(function (j) {
+      if (j.status === 401 && j.turnstile) throw new Error("ts");
+      q.slice(1).forEach(function (x) { cpostH(x[0], x[1]); });
+    }).catch(function () { CQ = q.concat(CQ); cbBar(true); });
+  }
+  function cfetchRound(ref) {
+    return fetch(CAPI + "/v1/contribute/round?n=5" + (ref ? "&ref=" + encodeURIComponent(ref) : ""))
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { j.status = r.status; return j; }); });
+  }
+  function cbFail(title, msg, ref) {
+    CB.retry = ref || "";
+    app.innerHTML = topbar("Bridges") + '<div class="card center stack"><h3>' + title + '</h3><p class="muted">' + msg + '</p><button class="btn primary" data-act="cbretry">Try again</button><button class="btn" data-act="home">Back home</button></div>';
+  }
+  function contribute(ref) {
+    CB = { cards: [], k: 0, contexts: [], ref: ref || "", done: 0, pick: -1, ctx: "", retry: "" };
+    app.innerHTML = topbar("Bridges") + '<div class="card center"><p class="muted">Loading passages…</p></div>';
+    var got = [], pool = [], tries = 0;
+    function take(j) {
+      if (j.turnstile) CTS = j.turnstile;
+      CB.contexts = j.life_contexts || CB.contexts; CB.note = j.note || CB.note;
+      (j.cards || []).forEach(function (c) { if (CSEEN[c.id] && !pool.some(function (g) { return g.id === c.id; })) pool.push(c); if (!CSEEN[c.id] && !got.some(function (g) { return g.id === c.id; })) got.push(c); });
+    }
+    function done() {
+      if (!got.length && !ref && !CB.reset) { CB.reset = 1; CSEEN = {}; tries = 0; return more(); }
+      if (!got.length) return cbFail("Bridges is resting", "No passages came back. Try again in a minute.", ref); /* seen them all this visit: start over */
+      /* late in a visit few passages are unseen: fill the round back to 5 with ones seen longest ago, then start the seen list over */
+      if (!ref && got.length < 5 && pool.length) { var fill = pool.slice(0, 5 - got.length); CSEEN = {}; got = got.concat(fill); }
+      got.forEach(function (c) { CSEEN[c.id] = 1; });
+      CB.cards = got.slice(0, 5); cbRender();
+      if (CTS && CTS.required && !tsStored()) getPass(false, false).catch(function () {}); /* warm the human check while they read */
+    }
+    function more() {
+      tries++;
+      return cfetchRound(ref).then(function (j) {
+        if (j.status === 429) { toast(SLOW); return cbFail("One moment", "Lots of people are helping right now. Wait a few seconds, then try again.", ref); }
+        if (j.status === 404 && ref) { toast("No explanations for this passage yet. Here are others."); return contribute(""); }
+        if (j.status !== 200) return cbFail("Bridges is resting", "The server didn’t answer right. Try again in a minute.", ref);
+        take(j);
+        if (ref) { got = (j.cards || []).slice(0, 5); return done(); } /* a passage the player asked for: show it even if seen */
+        if (got.length < 5 && tries < 4) return more();
+        done();
+      }, function () { cbFail("You’re offline", "Bridges needs an internet connection. Everything else in Line upon Line works offline.", ref); });
+    }
+    more();
+  }
+  function cbIntro() {
+    app.innerHTML = topbar("Bridges") +
+      '<div class="card stack"><div class="ic" style="font-size:28px">' + IC.bridge + '</div><h3 style="margin:0">Help others understand</h3>' +
+      '<p class="muted" style="margin:0">Read a passage, then tap the explanation that helps <i>you</i> understand it best, and where it has shown up in your life. When enough people agree, that explanation helps the next person.</p>' +
+      '<p class="small muted" style="margin:0">Anonymous: no name, no account. Two taps a passage, and you can skip anything. Your picks also help <b>Similarize</b> learn which explanations help people understand each other.</p>' +
+      '<button class="btn primary" data-act="cbstart">Start</button></div>';
+  }
+  function cbRender() {
+    var c = CB.cards[CB.k];
+    if (!c) {
+      app.innerHTML = topbar("Bridges") + '<div class="card center stack"><h3>Thank you</h3><p class="muted">You helped with ' + CB.done + " passage" + (CB.done === 1 ? "" : "s") + '. Explanations people agree on rise to the top for the next reader.</p><button class="btn primary" data-act="cbstart">Five more</button><button class="btn" data-act="home">Back home</button></div>';
+      return;
+    }
+    var verses = (c.verses || []).map(function (v) { return '<sup>' + esc(v.v) + "</sup> " + esc(v.text); }).join(" ");
+    var stage = CB.pick < 0 ? 1 : 2;
+    var fr = c.framings.map(function (f, i) {
+      var cls = CB.pick === i ? " ok" : "";
+      return '<button class="opt' + cls + '" data-act="cbpick" data-arg="' + i + '"' + (stage === 2 ? " disabled" : "") + ">" + esc(f.text) + "</button>";
+    }).join("");
+    var ctx = stage === 2 ? '<h3 style="margin-top:18px">Where has this shown up in your life?</h3><div class="cbctx">' + CB.contexts.map(function (x) { return '<button class="chip' + (CB.ctx === x.id ? " on" : "") + '" data-act="cbctx" data-arg="' + esc(x.id) + '">' + esc(x.label) + "</button>"; }).join("") + "</div>" : "";
+    app.innerHTML = topbar("Bridges", '<span class="pill">' + (CB.k + 1) + " of " + CB.cards.length + "</span>") +
+      '<div class="card stack"><div class="small muted">' + esc(c.ref) + '</div><div class="verse">' + verses + '</div><a class="small" href="' + esc(c.source.url) + '" target="_blank" rel="noopener">' + esc(c.source.name) + " ↗</a></div>" +
+      '<h3 style="margin-top:18px">Which helps you understand this best?</h3><p class="small muted" style="margin:-4px 0 10px">' + "Ways people explain it · not Church doctrine.</p>" +
+      '<div class="opts">' + fr + "</div>" + ctx +
+      '<div class="stack" style="margin-top:16px"><button class="btn' + (stage === 2 ? " primary" : " ghost") + '" data-act="cbnext">' + (stage === 2 ? "Next passage →" : "Skip this one") + "</button></div>";
+  }
+  ACT.bridges = function () { go(cbIntro); };
+  ACT.cbstart = function () { contribute(""); window.scrollTo(0, 0); }; /* Start and Five more: always a fresh random round */
+  ACT.cbretry = function () { contribute(CB ? CB.retry : ""); window.scrollTo(0, 0); }; /* Try again keeps the passage that failed */
+  ACT.cbpick = function (i) {
+    var c = CB.cards[CB.k]; i = +i; if (CB.pick >= 0) return;
+    CB.pick = i; CB.done++;
+    cpostH("/v1/contribute/framing", { token: c.token, pick: c.framings[i].id, shown: c.framings.map(function (f) { return f.id; }), session: csession() });
+    cbRender();
+  };
+  ACT.cbctx = function (id) {
+    var c = CB.cards[CB.k]; if (CB.ctx) return;
+    CB.ctx = id;
+    cpostH("/v1/contribute/context", { token: c.token, context: id, session: csession() });
+    cbRender(); setTimeout(function () { if (CB && CB.ctx === id) ACT.cbnext(); }, 650);
+  };
+  ACT.cbnext = function () { CB.k++; CB.pick = -1; CB.ctx = ""; cbRender(); window.scrollTo(0, 0); };
+  ACT.dmbridge = function (ref) { go(function () { contribute(ref); }); };
 
   window.__lul = { grade: grade, norm: norm, kwMatch: kwMatch, st: function () { return st; } };
   home();
