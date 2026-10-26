@@ -1,10 +1,10 @@
 /* Rootline "Hidden Weight" track: words whose origin carries more weight than people realise.
-   Reads lexicon.json (the same file Similarize loads), uses reviewed entries only.
+   Cards come only from the word bank Worker; the lexicon itself is not published.
    Per word: dig its root (pick the origin), pick a swap that keeps the meaning, then the reveal with sources.
    Swap picks are tallied on this device only (Phase 2 may upload them). Vanilla JS. */
 (function(){
 "use strict";
-var KEY="rootline.hw", LEX=null, H=null, PER=5;
+var KEY="rootline.hw", H=null, PER=5;
 var hs; try{ hs=JSON.parse(localStorage.getItem(KEY))||{}; }catch(e){ hs={}; }
 hs.seen=hs.seen||{}; hs.picks=hs.picks||{}; hs.rounds=hs.rounds||0; hs.best=hs.best||0;
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(hs)); }catch(e){} }
@@ -14,35 +14,15 @@ function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floo
 var CAT={gendered:"Gender",ethnic:"Ethnicity & origin",disability:"Disability & health",religious:"Religion",violent:"Violent imagery",political:"Politics",drift:"Meaning drift"};
 var HEAT=["Mostly harmless","Mild","Loaded","Slur"];
 /* Source: the word bank Worker (ROOTLINE_BANK_CONFIG.api) serves cards without answers (GET /v1/lexicon/round) and the
-   full entry per card with its signed token (GET /v1/lexicon/reveal). If the Worker can't be reached or doesn't have the
-   lexicon yet, fall back to the public lexicon.json and build the same cards locally. */
+   full entry per card with its signed token (GET /v1/lexicon/reveal). There is no local copy: if the Worker can't be
+   reached, the track says it's offline. */
 function api(){ var c=window.ROOTLINE_BANK_CONFIG; return c && c.api ? c.api.replace(/\/$/,"") : null; }
 function getJSON(u){ return fetch(u,{cache:"no-store"}).then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); }); }
-function load(){
-  if(LEX) return Promise.resolve(LEX);
-  return getJSON("lexicon.json").then(function(j){ LEX=(j.entries||[]).filter(function(e){ return e.status==="reviewed" && e.origin; }); return LEX; });
-}
-function localCards(){
-  var fresh=LEX.filter(function(e){ return !hs.seen[e.id]; });
-  if(fresh.length<PER){ hs.seen={}; fresh=LEX.slice(); }
-  return shuffle(fresh).slice(0,PER).map(function(e){
-    var others=shuffle(LEX.filter(function(x){ return x.id!==e.id && x.origin!==e.origin; })).slice(0,3).map(function(x){ return x.origin; });
-    var pool=LEX.filter(function(x){ return x.id!==e.id && x.heat>=2 && e.alternatives.indexOf(x.word)<0; });
-    var same=pool.filter(function(x){ return x.category===e.category; });
-    var dec=shuffle(same.length?same:pool)[0];
-    return {id:e.id, word:e.word, category:e.category, root_options:shuffle([e.origin].concat(others)),
-      swap_options:shuffle(e.alternatives.slice(0,3).concat(dec?[dec.word]:[])), entry:e, local:true};
-  });
-}
 function serverCards(){
   var a=api(); if(!a) return Promise.reject(new Error("no api"));
   return getJSON(a+"/v1/lexicon/round?n="+PER).then(function(j){ if(!j.cards||!j.cards.length) throw new Error("empty"); return j.cards; });
 }
 function reveal(c, pick){
-  if(c.local){
-    if(pick && c.entry.alternatives.indexOf(pick)<0){ var d=LEX.filter(function(x){ return x.word===pick; })[0]; c.decoy=d?{word:d.word,why_it_lands:d.why_it_lands}:null; }
-    return Promise.resolve(c);
-  }
   if(c.entry && !pick) return Promise.resolve(c);
   return getJSON(api()+"/v1/lexicon/reveal?id="+encodeURIComponent(c.id)+"&t="+encodeURIComponent(c.token)+(pick?"&pick="+encodeURIComponent(pick):""))
     .then(function(j){ c.entry=j.entry; c.decoy=j.decoy; return c; });
@@ -50,12 +30,12 @@ function reveal(c, pick){
 function start(){
   var app=document.getElementById("app");
   app.innerHTML=U().topbar("Hidden Weight")+'<div class="card"><p class="muted" style="margin:0">Loading words…</p></div>';
-  serverCards().then(function(cards){ return {cards:cards, src:"server"}; })
-    .catch(function(){ return load().then(function(){ if(!LEX.length) throw new Error("empty"); return {cards:localCards(), src:"local"}; }); })
-    .then(function(r){ H={words:r.cards, src:r.src, i:0, stage:"intro", score:0, hits:0, picked:-1, busy:false}; PER=r.cards.length; render(); })
-    .catch(function(){
-      app.innerHTML=U().topbar("Hidden Weight")+'<div class="card"><h3>Words unavailable</h3><p class="muted">Couldn\'t load the word list. Connect once to download it; after that it works offline.</p><button class="btn primary" data-act="hw-start">Try again</button></div>';
-    });
+  serverCards()
+    .then(function(cards){ H={words:cards, src:"server", i:0, stage:"intro", score:0, hits:0, picked:-1, busy:false}; PER=cards.length; render(); })
+    .catch(function(){ offline(); });
+}
+function offline(){
+  document.getElementById("app").innerHTML=U().topbar("Hidden Weight")+'<div class="card hw-offline"><h3>Hidden Weight is offline</h3><p class="muted">We couldn\'t reach the word list just now. Try again soon.</p><button class="btn primary" data-act="hw-start">Try again</button><div class="sep"></div><button class="btn" data-act="home">Home</button></div>';
 }
 function srcLinks(e){
   return '<div class="rs-src">Sources: '+e.sources.map(function(s){ return '<a href="'+esc(s.url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--gold)">'+esc(s.title)+'</a>'; }).join(" · ")+'</div>';
@@ -121,7 +101,7 @@ document.addEventListener("click",function(ev){
       if(a==="hw-swap"){ hs.picks[c.id]=hs.picks[c.id]||{}; hs.picks[c.id][t]=(hs.picks[c.id][t]||0)+1; save(); }
       render(); var b=document.querySelector('.opt[data-i="'+i+'"]'); if(b){ if(ok) U().dust(b); else b.classList.add("shake"); }
       var fb=document.querySelector(".feedback"); if(fb && fb.getBoundingClientRect().bottom>innerHeight) fb.scrollIntoView({behavior:"smooth",block:"center"});
-    }).catch(function(){ H.busy=false; U().toast("Couldn't check that one. Try again."); });
+    }).catch(function(){ H.busy=false; U().toast("Hidden Weight is offline. Try again soon."); });
   }
   else if(a==="hw-toswap"){ H.stage="swap"; H.opts=null; H.picked=-1; render(); }
   else if(a==="hw-reveal"){ H.stage="reveal"; hs.seen[H.words[H.i].id]=1; save(); render(); window.scrollTo(0,0); }
@@ -130,5 +110,5 @@ document.addEventListener("click",function(ev){
     else { H.stage="done"; hs.rounds++; if(H.score>hs.best) hs.best=H.score; save(); render(); window.scrollTo(0,0); }
   }
 });
-window.RootlineHW={start:start, homeCard:homeCard, load:load, state:function(){ return H; }};
+window.RootlineHW={start:start, homeCard:homeCard, state:function(){ return H; }};
 })();
