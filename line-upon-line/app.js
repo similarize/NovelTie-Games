@@ -134,7 +134,8 @@
     trail: SV('<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>'),
     timer: SV('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/>'),
     book: SV('<path d="M4 5c3-1 6-1 8 1 2-2 5-2 8-1v14c-3-1-6-1-8 1-2-2-5-2-8-1z"/><path d="M12 6v14"/>'),
-    pen: SV('<path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/>')
+    pen: SV('<path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/>'),
+    bridge: SV('<path d="M2 17h20M4 17v-4M20 17v-4M8 17v-6M16 17v-6M12 17V9"/><path d="M2 13c4-5 16-5 20 0"/>')
   };
   function home() {
     var ds = dailyState(), sk = streakNow();
@@ -152,6 +153,7 @@
       '<button class="tile" data-act="triv"><span class="ic">' + IC.timer + '</span><b>Trivia Sprint</b><small>60 seconds. Best: ' + (st.best.trivia || 0) + "</small></button>" +
       '<button class="tile" data-act="dm"><span class="ic">' + IC.book + '</span><b>Doctrinal Mastery</b><small>Seminary passages.' + (dmDue ? " " + dmDue + " due" : "") + "</small></button>" +
       '<button class="tile" data-act="journal"><span class="ic">' + IC.pen + '</span><b>Testimony Journal</b><small>' + st.journal.length + " saved</small></button>" +
+      '<button class="tile wide bridges" data-act="bridges"><span class="ic">' + IC.bridge + '</span><b>Bridges <span class="newtag">Help others</span></b><small>Two taps a passage: pick the explanation that helps you most. Your picks help the next reader, and help Similarize.</small></button>' +
       "</div>" +
       '<div class="foot"><button data-act="timeline">Full timeline</button> · <button data-act="sources">About &amp; sources</button><div>A personal study game · not an official Church product</div></div>';
   }
@@ -378,7 +380,7 @@
   function dmPassage(ref) {
     CURREF = ref; var m = dmByRef(ref), r = st.dm[ref];
     app.innerHTML = topbar(m.ref, lvl(r && r.box)) +
-      '<div class="card stack"><div class="small muted">Key scripture phrase</div><div class="keyp">' + esc(m.key) + '</div><div class="verse">' + versesHTML(m) + '</div><div class="acts" style="display:flex;gap:10px;flex-wrap:wrap"><a class="linkbtn" href="' + esc(m.url) + '" target="_blank" rel="noopener">Read in context ↗</a>' + saveBtn({ text: m.verses.map(function (v) { return v.t; }).join(" "), cite: m.ref, url: m.url }) + "</div></div>" +
+      '<div class="card stack"><div class="small muted">Key scripture phrase</div><div class="keyp">' + esc(m.key) + '</div><div class="verse">' + versesHTML(m) + '</div><div class="acts" style="display:flex;gap:10px;flex-wrap:wrap"><a class="linkbtn" href="' + esc(m.url) + '" target="_blank" rel="noopener">Read in context ↗</a>' + saveBtn({ text: m.verses.map(function (v) { return v.t; }).join(" "), cite: m.ref, url: m.url }) + '<button class="linkbtn" data-act="dmbridge" data-arg="' + esc(m.ref) + '">🌉 Help others understand</button>' + "</div></div>" +
       '<h3 style="margin-top:18px">Practice</h3><div class="stack"><button class="btn primary" data-act="dmmode" data-arg="blanks">Fill the blanks</button><button class="btn" data-act="dmmode" data-arg="letters">First-letter recall</button><button class="btn" data-act="dmmode" data-arg="ref">Which reference?</button></div>';
   }
   var MP = null;
@@ -509,6 +511,69 @@
       order.filter(function (k) { return groups[k]; }).map(function (k) { return '<div class="card srcl" style="margin-top:14px"><h3>' + esc(k) + "</h3>" + groups[k].map(function (s) { return '<a href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(s.label) + "<span>" + esc(s.url) + "</span></a>"; }).join("") + "</div>"; }).join("");
   }
   ACT.reset = function (a, b) { if (b.getAttribute("data-confirm") !== "1") { b.setAttribute("data-confirm", "1"); b.textContent = "Tap again to erase progress (journal is kept)"; return; } var j = st.journal; st.dc = {}; st.dm = {}; st.best = { trivia: 0, hist: 0 }; st.streak = 0; st.lastDone = ""; st.daily = { date: "", step: 0, res: [] }; st.journal = j; save(); toast("Progress reset"); sources(); };
+
+
+  /* ---------- Contribute (Bridges): one-tap insights that help others understand, and help Similarize learn which explanations land ---------- */
+  var CAPI = (function () { try { var q = new URLSearchParams(location.search).get("api"); if (q) return q.replace(/\/$/, ""); } catch (e) {} return "https://lineuponline-bank-staging.ben-e22.workers.dev"; })();
+  function csession() { var s = ""; try { s = localStorage.getItem("lul-session") || ""; if (!s) { var a = new Uint8Array(16); (window.crypto || {}).getRandomValues ? crypto.getRandomValues(a) : a.forEach(function (_, i) { a[i] = Math.random() * 256; }); s = Array.prototype.map.call(a, function (b) { return ("0" + b.toString(16)).slice(-2); }).join(""); localStorage.setItem("lul-session", s); } } catch (e) { s = "anon" + Date.now(); } return s; }
+  var CB = null;
+  function cpost(path, body) { return fetch(CAPI + path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { j.status = r.status; return j; }); }); }
+  function contribute(ref) {
+    CB = { cards: [], k: 0, contexts: [], ref: ref || "", done: 0, pick: -1, ctx: "" };
+    app.innerHTML = topbar("Bridges") + '<div class="card center"><p class="muted">Loading passages…</p></div>';
+    var url = CAPI + "/v1/contribute/round?n=5" + (ref ? "&ref=" + encodeURIComponent(ref) : "");
+    fetch(url).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (j) {
+      if ((!j.cards || !j.cards.length) && ref) { toast("No explanations for this passage yet. Here are others."); return contribute(""); }
+      CB.cards = j.cards || []; CB.contexts = j.life_contexts || []; CB.note = j.note || "";
+      if (!CB.cards.length) throw new Error("empty");
+      cbRender();
+    }).catch(function () {
+      if (ref && CB && CB.ref) { toast("No explanations for this passage yet. Here are others."); return contribute(""); }
+      app.innerHTML = topbar("Bridges") + '<div class="card center stack"><h3>You’re offline</h3><p class="muted">Bridges needs an internet connection. Everything else in Line upon Line works offline.</p><button class="btn primary" data-act="cbstart">Try again</button><button class="btn" data-act="home">Back home</button></div>';
+    });
+  }
+  function cbIntro() {
+    app.innerHTML = topbar("Bridges") +
+      '<div class="card stack"><div class="ic" style="font-size:28px">' + IC.bridge + '</div><h3 style="margin:0">Help others understand</h3>' +
+      '<p class="muted" style="margin:0">Read a passage, then tap the explanation that helps <i>you</i> understand it best, and where it has shown up in your life. When enough people agree, that explanation helps the next person.</p>' +
+      '<p class="small muted" style="margin:0">Anonymous: no name, no account. Two taps a passage, and you can skip anything. Your picks also help <b>Similarize</b> learn which explanations help people understand each other.</p>' +
+      '<button class="btn primary" data-act="cbstart">Start</button></div>';
+  }
+  function cbRender() {
+    var c = CB.cards[CB.k];
+    if (!c) {
+      app.innerHTML = topbar("Bridges") + '<div class="card center stack"><h3>Thank you</h3><p class="muted">You helped with ' + CB.done + " passage" + (CB.done === 1 ? "" : "s") + '. Explanations people agree on rise to the top for the next reader.</p><button class="btn primary" data-act="cbstart">Five more</button><button class="btn" data-act="home">Back home</button></div>';
+      return;
+    }
+    var verses = (c.verses || []).map(function (v) { return '<sup>' + esc(v.v) + "</sup> " + esc(v.text); }).join(" ");
+    var stage = CB.pick < 0 ? 1 : 2;
+    var fr = c.framings.map(function (f, i) {
+      var cls = CB.pick === i ? " ok" : "";
+      return '<button class="opt' + cls + '" data-act="cbpick" data-arg="' + i + '"' + (stage === 2 ? " disabled" : "") + ">" + esc(f.text) + "</button>";
+    }).join("");
+    var ctx = stage === 2 ? '<h3 style="margin-top:18px">Where has this shown up in your life?</h3><div class="cbctx">' + CB.contexts.map(function (x) { return '<button class="chip' + (CB.ctx === x.id ? " on" : "") + '" data-act="cbctx" data-arg="' + esc(x.id) + '">' + esc(x.label) + "</button>"; }).join("") + "</div>" : "";
+    app.innerHTML = topbar("Bridges", '<span class="pill">' + (CB.k + 1) + " of " + CB.cards.length + "</span>") +
+      '<div class="card stack"><div class="small muted">' + esc(c.ref) + '</div><div class="verse">' + verses + '</div><a class="small" href="' + esc(c.source.url) + '" target="_blank" rel="noopener">' + esc(c.source.name) + " ↗</a></div>" +
+      '<h3 style="margin-top:18px">Which helps you understand this best?</h3><p class="small muted" style="margin:-4px 0 10px">' + esc(c.framings_label || "Members' insights") + ", not Church doctrine.</p>" +
+      '<div class="opts">' + fr + "</div>" + ctx +
+      '<div class="stack" style="margin-top:16px"><button class="btn' + (stage === 2 ? " primary" : " ghost") + '" data-act="cbnext">' + (stage === 2 ? "Next passage →" : "Skip this one") + "</button></div>";
+  }
+  ACT.bridges = function () { go(cbIntro); };
+  ACT.cbstart = function () { contribute(CB && CB.ref ? CB.ref : ""); window.scrollTo(0, 0); };
+  ACT.cbpick = function (i) {
+    var c = CB.cards[CB.k]; i = +i; if (CB.pick >= 0) return;
+    CB.pick = i; CB.done++;
+    cpost("/v1/contribute/framing", { token: c.token, pick: c.framings[i].id, shown: c.framings.map(function (f) { return f.id; }), session: csession() }).then(function (j) { if (j.status === 429) toast("Slow down a moment, then keep going."); }).catch(function () {});
+    cbRender();
+  };
+  ACT.cbctx = function (id) {
+    var c = CB.cards[CB.k]; if (CB.ctx) return;
+    CB.ctx = id;
+    cpost("/v1/contribute/context", { token: c.token, context: id, session: csession() }).catch(function () {});
+    cbRender(); setTimeout(function () { if (CB && CB.ctx === id) ACT.cbnext(); }, 650);
+  };
+  ACT.cbnext = function () { CB.k++; CB.pick = -1; CB.ctx = ""; cbRender(); window.scrollTo(0, 0); };
+  ACT.dmbridge = function (ref) { go(function () { contribute(ref); }); };
 
   window.__lul = { grade: grade, norm: norm, kwMatch: kwMatch, st: function () { return st; } };
   home();
