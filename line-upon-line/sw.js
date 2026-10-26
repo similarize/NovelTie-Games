@@ -1,6 +1,6 @@
 /* Line upon Line service worker: caches the game so it works offline after the first load.
    Stale-while-revalidate for same-origin files. */
-var CACHE = 'lineuponline-v8';
+var CACHE = 'lineuponline-v9';
 var FILES = ['./', 'index.html', 'style.css', 'data.js', 'app.js',
   'assets/icon-192.png', 'assets/icon-512.png', 'assets/icon-180.png', 'assets/icon-maskable-512.png'];
 self.addEventListener('install', function (e) {
