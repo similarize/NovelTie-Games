@@ -525,42 +525,79 @@
   var CB = null, CSEEN = {}, CTS = null; /* CTS = {required, site_key} from the last round */
   var SLOW = "Slow down a moment, then keep going.";
   function cpost(path, body) { return fetch(CAPI + path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { j.status = r.status; return j; }); }); }
-  /* Turnstile "I'm human" check: once per visit; the 12 h pass from /verify rides on every post. */
-  var tsPassP = null;
+  /* Turnstile "I'm human" check: once per visit; the 12 h pass from /verify rides on every post.
+     If the check is blocked or never finishes, taps are queued (never silently dropped) and a bar offers Retry. */
+  var tsPassP = null, CQ = [];
   function tsStored() { try { var o = JSON.parse(sessionStorage.getItem("lul-ts") || "null"); if (o && o.pass && o.exp > Date.now() + 60000) return o.pass; } catch (e) {} return ""; }
   function tsLoad() {
     if (window.turnstile) return Promise.resolve(window.turnstile);
     return new Promise(function (res, rej) {
       var s = document.createElement("script"); s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"; s.async = true;
-      s.onload = function () { window.turnstile ? res(window.turnstile) : rej(new Error("ts")); }; s.onerror = rej; document.head.appendChild(s);
+      s.onload = function () { window.turnstile ? res(window.turnstile) : rej(new Error("ts")); }; s.onerror = function () { rej(new Error("ts blocked")); }; document.head.appendChild(s);
+      setTimeout(function () { rej(new Error("ts load timeout")); }, 15000);
     });
   }
-  function tsBox() { var el = document.getElementById("cbts"); if (!el) { el = document.createElement("div"); el.id = "cbts"; el.className = "cbts"; document.body.appendChild(el); } return el; }
+  /* the widget lives in its own sheet above the page (never over an answer); it only shows if Cloudflare needs a tap */
+  function tsSheet() {
+    var el = document.getElementById("cbts");
+    if (!el) { el = document.createElement("div"); el.id = "cbts"; el.className = "cbts"; el.innerHTML = '<div class="cbts-card"><p class="small" style="margin:0 0 8px">Quick check that you’re human, then your taps are saved.</p><div class="cbts-w"></div></div>'; document.body.appendChild(el); }
+    return el;
+  }
+  function cbBar(show) {
+    var el = document.getElementById("cbbar");
+    if (!show) { if (el) el.style.display = "none"; return; }
+    if (!el) { el = document.createElement("div"); el.id = "cbbar"; el.className = "cbbar"; document.body.appendChild(el);
+      el.onclick = function (e) { if (e.target.getAttribute("data-x") === "retry") { el.style.display = "none"; cflush(true); } else if (e.target.getAttribute("data-x") === "close") { el.style.display = "none"; } }; }
+    var n = CQ.length;
+    el.innerHTML = '<span>' + (n === 1 ? "Your last tap isn’t saved yet" : "Your last " + n + " taps aren’t saved yet") + '.</span><button class="btn primary" data-x="retry">Retry</button><button class="iconbtn" data-x="close" aria-label="Close">×</button>';
+    el.style.display = "flex";
+  }
   function getPass(fresh) {
     if (!CTS || !CTS.required) return Promise.resolve("");
     if (!fresh) { var p = tsStored(); if (p) return Promise.resolve(p); if (tsPassP) return tsPassP; }
     try { sessionStorage.removeItem("lul-ts"); } catch (e) {}
     tsPassP = tsLoad().then(function (ts) {
       return new Promise(function (res, rej) {
-        var box = tsBox(); box.innerHTML = ""; box.style.display = "block";
-        var id = ts.render(box, { sitekey: CTS.site_key, appearance: "interaction-only", callback: function (tok) {
-          cpost("/v1/contribute/verify", { turnstile: tok, session: csession() }).then(function (j) {
-            try { ts.remove(id); } catch (e) {} box.style.display = "none";
-            if (j.pass) { try { sessionStorage.setItem("lul-ts", JSON.stringify({ pass: j.pass, exp: Date.now() + (j.expires_in || 43200) * 1000 })); } catch (e) {} res(j.pass); }
-            else rej(new Error("verify"));
-          }, rej);
-        }, "error-callback": function () { box.style.display = "none"; rej(new Error("ts")); } });
+        var sheet = tsSheet(), w = sheet.querySelector(".cbts-w"), id = null, live = false, done = false;
+        w.innerHTML = "";
+        function end(err, pass) { if (done) return; done = true; clearTimeout(tm); sheet.style.display = "none"; try { if (id !== null) ts.remove(id); } catch (e) {} err ? rej(err) : res(pass); }
+        /* no answer within 20 s (blocked, or stuck) counts as a failure; once Cloudflare asks for a tap, give the player 2 min */
+        var tm = setTimeout(function () { end(new Error("ts timeout")); }, 20000);
+        id = ts.render(w, { sitekey: CTS.site_key, appearance: "interaction-only",
+          "before-interactive-callback": function () { live = true; sheet.style.display = "flex"; clearTimeout(tm); tm = setTimeout(function () { end(new Error("ts timeout")); }, 120000); },
+          "after-interactive-callback": function () { sheet.style.display = "none"; },
+          callback: function (tok) {
+            cpost("/v1/contribute/verify", { turnstile: tok, session: csession() }).then(function (j) {
+              if (j.pass) { try { sessionStorage.setItem("lul-ts", JSON.stringify({ pass: j.pass, exp: Date.now() + (j.expires_in || 43200) * 1000 })); } catch (e) {} end(null, j.pass); }
+              else end(new Error("verify " + j.status));
+            }, function (e) { end(e); });
+          },
+          "error-callback": function () { end(new Error("ts error")); return true; },
+          "timeout-callback": function () { end(new Error("ts timeout")); } });
       });
     });
     tsPassP.catch(function () {}).then(function () { tsPassP = null; });
     return tsPassP;
   }
-  /* every contribution post: add the pass, re-check once on 401, toast on 429; never blocks play */
+  /* every contribution post: add the pass, re-check once on 401, toast on 429; if the check can't finish, queue it and show Retry */
+  function csend(path, body, fresh) { return getPass(fresh).then(function (pass) { var b = {}; for (var k in body) b[k] = body[k]; if (pass) b.pass = pass; return cpost(path, b); }); }
   function cpostH(path, body) {
-    function send(fresh) { return getPass(fresh).then(function (pass) { var b = {}; for (var k in body) b[k] = body[k]; if (pass) b.pass = pass; return cpost(path, b); }); }
-    return send(false).then(function (j) { return j.status === 401 && j.turnstile ? send(true) : j; })
-      .then(function (j) { if (j.status === 429) toast(SLOW); return j; })
-      .catch(function () {});
+    return csend(path, body, false).then(function (j) { return j.status === 401 && j.turnstile ? csend(path, body, true) : j; })
+      .then(function (j) {
+        if (j.status === 401 && j.turnstile) throw new Error("ts");
+        if (j.status === 429) toast(SLOW);
+        if (CQ.length && j.status === 200) cflush(false);
+        return j;
+      })
+      .catch(function () { CQ.push([path, body]); cbBar(true); });
+  }
+  function cflush(fresh) {
+    var q = CQ; CQ = []; cbBar(false); if (!q.length) return;
+    var first = q[0];
+    csend(first[0], first[1], fresh).then(function (j) {
+      if (j.status === 401 && j.turnstile) throw new Error("ts");
+      q.slice(1).forEach(function (x) { cpostH(x[0], x[1]); });
+    }).catch(function () { CQ = q.concat(CQ); cbBar(true); });
   }
   function cfetchRound(ref) {
     return fetch(CAPI + "/v1/contribute/round?n=5" + (ref ? "&ref=" + encodeURIComponent(ref) : ""))
