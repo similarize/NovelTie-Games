@@ -540,7 +540,7 @@
   /* the widget lives in its own sheet above the page (never over an answer); it only shows if Cloudflare needs a tap */
   function tsSheet() {
     var el = document.getElementById("cbts");
-    if (!el) { el = document.createElement("div"); el.id = "cbts"; el.className = "cbts"; el.innerHTML = '<div class="cbts-card"><p class="small" style="margin:0 0 8px">Quick check that you’re human, then your taps are saved.</p><div class="cbts-w"></div></div>'; document.body.appendChild(el); }
+    if (!el) { el = document.createElement("div"); el.id = "cbts"; el.className = "cbts"; el.innerHTML = '<div class="cbts-card"><p class="small" style="margin:0 0 8px">Quick check that you’re human, then your taps are saved.</p><div class="cbts-w"></div><button class="btn" data-x="notnow" style="margin-top:10px">Not now</button></div>'; document.body.appendChild(el); }
     return el;
   }
   function cbBar(show) {
@@ -549,24 +549,34 @@
     if (!el) { el = document.createElement("div"); el.id = "cbbar"; el.className = "cbbar"; document.body.appendChild(el);
       el.onclick = function (e) { if (e.target.getAttribute("data-x") === "retry") { el.style.display = "none"; cflush(true); } else if (e.target.getAttribute("data-x") === "close") { el.style.display = "none"; } }; }
     var n = CQ.length;
-    el.innerHTML = '<span>' + (n === 1 ? "Your last tap isn’t saved yet" : "Your last " + n + " taps aren’t saved yet") + '.</span><button class="btn primary" data-x="retry">Retry</button><button class="iconbtn" data-x="close" aria-label="Close">×</button>';
+    el.innerHTML = '<span>' + (n === 1 ? "1 tap not saved" : n + " taps not saved") + '</span><button class="btn primary" data-x="retry">Retry</button><button class="iconbtn" data-x="close" aria-label="Close">×</button>';
     el.style.display = "flex";
   }
-  function getPass(fresh) {
+  /* tsFailed: after a failed check, nothing re-checks on its own; only Retry does (taps just queue behind the bar).
+     ask: true only when a tap is waiting; a warm-up that needs a visible tap quietly stands down instead of opening the sheet. */
+  var tsFailed = false, tsId = null;
+  function getPass(fresh, ask) {
     if (!CTS || !CTS.required) return Promise.resolve("");
-    if (!fresh) { var p = tsStored(); if (p) return Promise.resolve(p); if (tsPassP) return tsPassP; }
+    if (!fresh) { var p = tsStored(); if (p) return Promise.resolve(p); if (tsFailed) return Promise.reject(new Error("ts failed")); if (tsPassP) return tsPassP; }
+    tsFailed = false;
     try { sessionStorage.removeItem("lul-ts"); } catch (e) {}
     tsPassP = tsLoad().then(function (ts) {
       return new Promise(function (res, rej) {
-        var sheet = tsSheet(), w = sheet.querySelector(".cbts-w"), id = null, live = false, done = false;
+        var sheet = tsSheet(), w = sheet.querySelector(".cbts-w"), done = false;
+        /* drop the previous, finished widget before a new one (never inside Turnstile's own callbacks) */
+        if (tsId !== null) { try { ts.remove(tsId); } catch (e) {} tsId = null; }
         w.innerHTML = "";
-        function end(err, pass) { if (done) return; done = true; clearTimeout(tm); sheet.style.display = "none"; try { if (id !== null) ts.remove(id); } catch (e) {} err ? rej(err) : res(pass); }
-        /* no answer within 20 s (blocked, or stuck) counts as a failure; once Cloudflare asks for a tap, give the player 2 min */
+        function end(err, pass) { if (done) return; done = true; clearTimeout(tm); sheet.style.display = "none"; err ? rej(err) : res(pass); }
+        sheet.onclick = function (e) { if (e.target.getAttribute("data-x") === "notnow") end(new Error("ts not now")); };
         var tm = setTimeout(function () { end(new Error("ts timeout")); }, 20000);
-        id = ts.render(w, { sitekey: CTS.site_key, appearance: "interaction-only",
-          "before-interactive-callback": function () { live = true; sheet.style.display = "flex"; clearTimeout(tm); tm = setTimeout(function () { end(new Error("ts timeout")); }, 120000); },
+        tsId = ts.render(w, { sitekey: CTS.site_key, appearance: "interaction-only", retry: "never", "refresh-expired": "manual", "refresh-timeout": "manual",
+          "before-interactive-callback": function () {
+            if (!ask) { var e = new Error("ts needs tap"); e.quiet = true; return end(e); }
+            sheet.style.display = "flex"; clearTimeout(tm); tm = setTimeout(function () { end(new Error("ts timeout")); }, 120000);
+          },
           "after-interactive-callback": function () { sheet.style.display = "none"; },
           callback: function (tok) {
+            if (done) return;
             cpost("/v1/contribute/verify", { turnstile: tok, session: csession() }).then(function (j) {
               if (j.pass) { try { sessionStorage.setItem("lul-ts", JSON.stringify({ pass: j.pass, exp: Date.now() + (j.expires_in || 43200) * 1000 })); } catch (e) {} end(null, j.pass); }
               else end(new Error("verify " + j.status));
@@ -576,15 +586,14 @@
           "timeout-callback": function () { end(new Error("ts timeout")); } });
       });
     });
-    tsPassP.catch(function () {}).then(function () { tsPassP = null; });
+    tsPassP.then(function () { tsPassP = null; }, function (e) { tsPassP = null; if (!e || !e.quiet) tsFailed = true; });
     return tsPassP;
   }
-  /* every contribution post: add the pass, re-check once on 401, toast on 429; if the check can't finish, queue it and show Retry */
-  function csend(path, body, fresh) { return getPass(fresh).then(function (pass) { var b = {}; for (var k in body) b[k] = body[k]; if (pass) b.pass = pass; return cpost(path, b); }); }
+  function csend(path, body, fresh) { return getPass(fresh, true).then(function (pass) { var b = {}; for (var k in body) b[k] = body[k]; if (pass) b.pass = pass; return cpost(path, b); }); }
   function cpostH(path, body) {
     return csend(path, body, false).then(function (j) { return j.status === 401 && j.turnstile ? csend(path, body, true) : j; })
       .then(function (j) {
-        if (j.status === 401 && j.turnstile) throw new Error("ts");
+        if (j.status === 401 && j.turnstile) { tsFailed = true; throw new Error("ts"); }
         if (j.status === 429) toast(SLOW);
         if (CQ.length && j.status === 200) cflush(false);
         return j;
@@ -610,18 +619,20 @@
   function contribute(ref) {
     CB = { cards: [], k: 0, contexts: [], ref: ref || "", done: 0, pick: -1, ctx: "", retry: "" };
     app.innerHTML = topbar("Bridges") + '<div class="card center"><p class="muted">Loading passages…</p></div>';
-    var got = [], tries = 0;
+    var got = [], pool = [], tries = 0;
     function take(j) {
       if (j.turnstile) CTS = j.turnstile;
       CB.contexts = j.life_contexts || CB.contexts; CB.note = j.note || CB.note;
-      (j.cards || []).forEach(function (c) { if (!CSEEN[c.id] && !got.some(function (g) { return g.id === c.id; })) got.push(c); });
+      (j.cards || []).forEach(function (c) { if (CSEEN[c.id] && !pool.some(function (g) { return g.id === c.id; })) pool.push(c); if (!CSEEN[c.id] && !got.some(function (g) { return g.id === c.id; })) got.push(c); });
     }
     function done() {
       if (!got.length && !ref && !CB.reset) { CB.reset = 1; CSEEN = {}; tries = 0; return more(); }
       if (!got.length) return cbFail("Bridges is resting", "No passages came back. Try again in a minute.", ref); /* seen them all this visit: start over */
+      /* late in a visit few passages are unseen: fill the round back to 5 with ones seen longest ago, then start the seen list over */
+      if (!ref && got.length < 5 && pool.length) { var fill = pool.slice(0, 5 - got.length); CSEEN = {}; got = got.concat(fill); }
       got.forEach(function (c) { CSEEN[c.id] = 1; });
       CB.cards = got.slice(0, 5); cbRender();
-      if (CTS && CTS.required && !tsStored()) getPass().catch(function () {}); /* warm the human check while they read */
+      if (CTS && CTS.required && !tsStored()) getPass(false, false).catch(function () {}); /* warm the human check while they read */
     }
     function more() {
       tries++;
