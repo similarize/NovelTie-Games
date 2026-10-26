@@ -26,7 +26,7 @@
   function shuffle(arr, r) { r = r || R; var a = arr.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(r() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
   function pick(arr, r) { r = r || R; return arr[Math.floor(r() * arr.length)]; }
   var toastT;
-  function toast(msg) { var t = document.querySelector(".toast"); if (!t) { t = document.createElement("div"); t.className = "toast"; document.body.appendChild(t); } t.textContent = msg; t.style.display = "block"; clearTimeout(toastT); toastT = setTimeout(function () { t.style.display = "none"; }, 2200); }
+  function toast(msg) { var t = document.querySelector(".toast"); if (!t) { t = document.createElement("div"); t.className = "toast"; t.onclick = function () { t.style.display = "none"; }; document.body.appendChild(t); } t.textContent = msg; t.style.display = "block"; clearTimeout(toastT); toastT = setTimeout(function () { t.style.display = "none"; }, 2200); }
   function schedule(rec, pass) { rec.box = pass ? Math.min((rec.box || 0) + 1, 5) : 0; rec.due = Date.now() + (rec.box === 0 ? 10 * MIN : INT[rec.box] * DAY); rec.seen = (rec.seen || 0) + 1; }
 
   /* ---------- text grading ---------- */
@@ -514,23 +514,91 @@
 
 
   /* ---------- Contribute (Bridges): one-tap insights that help others understand, and help Similarize learn which explanations land ---------- */
-  var CAPI = (function () { try { var q = new URLSearchParams(location.search).get("api"); if (q) return q.replace(/\/$/, ""); } catch (e) {} return "https://lineuponline-bank-staging.ben-e22.workers.dev"; })();
+  var CHOSTS = { prod: "https://lineuponline-bank.ben-e22.workers.dev", staging: "https://lineuponline-bank-staging.ben-e22.workers.dev" };
+  /* prod only on games.noveltie.com (prod CORS + Turnstile hostname allow only that); staging everywhere else. ?api= may only pick one of the two bank hosts. */
+  var CAPI = (function () {
+    var d = location.hostname === "games.noveltie.com" ? CHOSTS.prod : CHOSTS.staging;
+    try { var q = (new URLSearchParams(location.search).get("api") || "").replace(/\/$/, ""); if (q === CHOSTS.prod || q === CHOSTS.staging) return q; } catch (e) {}
+    return d;
+  })();
   function csession() { var s = ""; try { s = localStorage.getItem("lul-session") || ""; if (!s) { var a = new Uint8Array(16); (window.crypto || {}).getRandomValues ? crypto.getRandomValues(a) : a.forEach(function (_, i) { a[i] = Math.random() * 256; }); s = Array.prototype.map.call(a, function (b) { return ("0" + b.toString(16)).slice(-2); }).join(""); localStorage.setItem("lul-session", s); } } catch (e) { s = "anon" + Date.now(); } return s; }
-  var CB = null;
+  var CB = null, CSEEN = {}, CTS = null; /* CTS = {required, site_key} from the last round */
+  var SLOW = "Slow down a moment, then keep going.";
   function cpost(path, body) { return fetch(CAPI + path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { j.status = r.status; return j; }); }); }
-  function contribute(ref) {
-    CB = { cards: [], k: 0, contexts: [], ref: ref || "", done: 0, pick: -1, ctx: "" };
-    app.innerHTML = topbar("Bridges") + '<div class="card center"><p class="muted">Loading passages…</p></div>';
-    var url = CAPI + "/v1/contribute/round?n=5" + (ref ? "&ref=" + encodeURIComponent(ref) : "");
-    fetch(url).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (j) {
-      if ((!j.cards || !j.cards.length) && ref) { toast("No explanations for this passage yet. Here are others."); return contribute(""); }
-      CB.cards = j.cards || []; CB.contexts = j.life_contexts || []; CB.note = j.note || "";
-      if (!CB.cards.length) throw new Error("empty");
-      cbRender();
-    }).catch(function () {
-      if (ref && CB && CB.ref) { toast("No explanations for this passage yet. Here are others."); return contribute(""); }
-      app.innerHTML = topbar("Bridges") + '<div class="card center stack"><h3>You’re offline</h3><p class="muted">Bridges needs an internet connection. Everything else in Line upon Line works offline.</p><button class="btn primary" data-act="cbstart">Try again</button><button class="btn" data-act="home">Back home</button></div>';
+  /* Turnstile "I'm human" check: once per visit; the 12 h pass from /verify rides on every post. */
+  var tsPassP = null;
+  function tsStored() { try { var o = JSON.parse(sessionStorage.getItem("lul-ts") || "null"); if (o && o.pass && o.exp > Date.now() + 60000) return o.pass; } catch (e) {} return ""; }
+  function tsLoad() {
+    if (window.turnstile) return Promise.resolve(window.turnstile);
+    return new Promise(function (res, rej) {
+      var s = document.createElement("script"); s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"; s.async = true;
+      s.onload = function () { window.turnstile ? res(window.turnstile) : rej(new Error("ts")); }; s.onerror = rej; document.head.appendChild(s);
     });
+  }
+  function tsBox() { var el = document.getElementById("cbts"); if (!el) { el = document.createElement("div"); el.id = "cbts"; el.className = "cbts"; document.body.appendChild(el); } return el; }
+  function getPass(fresh) {
+    if (!CTS || !CTS.required) return Promise.resolve("");
+    if (!fresh) { var p = tsStored(); if (p) return Promise.resolve(p); if (tsPassP) return tsPassP; }
+    try { sessionStorage.removeItem("lul-ts"); } catch (e) {}
+    tsPassP = tsLoad().then(function (ts) {
+      return new Promise(function (res, rej) {
+        var box = tsBox(); box.innerHTML = ""; box.style.display = "block";
+        var id = ts.render(box, { sitekey: CTS.site_key, appearance: "interaction-only", callback: function (tok) {
+          cpost("/v1/contribute/verify", { turnstile: tok, session: csession() }).then(function (j) {
+            try { ts.remove(id); } catch (e) {} box.style.display = "none";
+            if (j.pass) { try { sessionStorage.setItem("lul-ts", JSON.stringify({ pass: j.pass, exp: Date.now() + (j.expires_in || 43200) * 1000 })); } catch (e) {} res(j.pass); }
+            else rej(new Error("verify"));
+          }, rej);
+        }, "error-callback": function () { box.style.display = "none"; rej(new Error("ts")); } });
+      });
+    });
+    tsPassP.catch(function () {}).then(function () { tsPassP = null; });
+    return tsPassP;
+  }
+  /* every contribution post: add the pass, re-check once on 401, toast on 429; never blocks play */
+  function cpostH(path, body) {
+    function send(fresh) { return getPass(fresh).then(function (pass) { var b = {}; for (var k in body) b[k] = body[k]; if (pass) b.pass = pass; return cpost(path, b); }); }
+    return send(false).then(function (j) { return j.status === 401 && j.turnstile ? send(true) : j; })
+      .then(function (j) { if (j.status === 429) toast(SLOW); return j; })
+      .catch(function () {});
+  }
+  function cfetchRound(ref) {
+    return fetch(CAPI + "/v1/contribute/round?n=5" + (ref ? "&ref=" + encodeURIComponent(ref) : ""))
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { j.status = r.status; return j; }); });
+  }
+  function cbFail(title, msg, ref) {
+    CB.retry = ref || "";
+    app.innerHTML = topbar("Bridges") + '<div class="card center stack"><h3>' + title + '</h3><p class="muted">' + msg + '</p><button class="btn primary" data-act="cbretry">Try again</button><button class="btn" data-act="home">Back home</button></div>';
+  }
+  function contribute(ref) {
+    CB = { cards: [], k: 0, contexts: [], ref: ref || "", done: 0, pick: -1, ctx: "", retry: "" };
+    app.innerHTML = topbar("Bridges") + '<div class="card center"><p class="muted">Loading passages…</p></div>';
+    var got = [], tries = 0;
+    function take(j) {
+      if (j.turnstile) CTS = j.turnstile;
+      CB.contexts = j.life_contexts || CB.contexts; CB.note = j.note || CB.note;
+      (j.cards || []).forEach(function (c) { if (!CSEEN[c.id] && !got.some(function (g) { return g.id === c.id; })) got.push(c); });
+    }
+    function done() {
+      if (!got.length && !ref && !CB.reset) { CB.reset = 1; CSEEN = {}; tries = 0; return more(); }
+      if (!got.length) return cbFail("Bridges is resting", "No passages came back. Try again in a minute.", ref); /* seen them all this visit: start over */
+      got.forEach(function (c) { CSEEN[c.id] = 1; });
+      CB.cards = got.slice(0, 5); cbRender();
+      if (CTS && CTS.required && !tsStored()) getPass().catch(function () {}); /* warm the human check while they read */
+    }
+    function more() {
+      tries++;
+      return cfetchRound(ref).then(function (j) {
+        if (j.status === 429) { toast(SLOW); return cbFail("One moment", "Lots of people are helping right now. Wait a few seconds, then try again.", ref); }
+        if (j.status === 404 && ref) { toast("No explanations for this passage yet. Here are others."); return contribute(""); }
+        if (j.status !== 200) return cbFail("Bridges is resting", "The server didn’t answer right. Try again in a minute.", ref);
+        take(j);
+        if (ref) { got = (j.cards || []).slice(0, 5); return done(); } /* a passage the player asked for: show it even if seen */
+        if (got.length < 5 && tries < 4) return more();
+        done();
+      }, function () { cbFail("You’re offline", "Bridges needs an internet connection. Everything else in Line upon Line works offline.", ref); });
+    }
+    more();
   }
   function cbIntro() {
     app.innerHTML = topbar("Bridges") +
@@ -559,17 +627,18 @@
       '<div class="stack" style="margin-top:16px"><button class="btn' + (stage === 2 ? " primary" : " ghost") + '" data-act="cbnext">' + (stage === 2 ? "Next passage →" : "Skip this one") + "</button></div>";
   }
   ACT.bridges = function () { go(cbIntro); };
-  ACT.cbstart = function () { contribute(CB && CB.ref ? CB.ref : ""); window.scrollTo(0, 0); };
+  ACT.cbstart = function () { contribute(""); window.scrollTo(0, 0); }; /* Start and Five more: always a fresh random round */
+  ACT.cbretry = function () { contribute(CB ? CB.retry : ""); window.scrollTo(0, 0); }; /* Try again keeps the passage that failed */
   ACT.cbpick = function (i) {
     var c = CB.cards[CB.k]; i = +i; if (CB.pick >= 0) return;
     CB.pick = i; CB.done++;
-    cpost("/v1/contribute/framing", { token: c.token, pick: c.framings[i].id, shown: c.framings.map(function (f) { return f.id; }), session: csession() }).then(function (j) { if (j.status === 429) toast("Slow down a moment, then keep going."); }).catch(function () {});
+    cpostH("/v1/contribute/framing", { token: c.token, pick: c.framings[i].id, shown: c.framings.map(function (f) { return f.id; }), session: csession() });
     cbRender();
   };
   ACT.cbctx = function (id) {
     var c = CB.cards[CB.k]; if (CB.ctx) return;
     CB.ctx = id;
-    cpost("/v1/contribute/context", { token: c.token, context: id, session: csession() }).catch(function () {});
+    cpostH("/v1/contribute/context", { token: c.token, context: id, session: csession() });
     cbRender(); setTimeout(function () { if (CB && CB.ctx === id) ACT.cbnext(); }, 650);
   };
   ACT.cbnext = function () { CB.k++; CB.pick = -1; CB.ctx = ""; cbRender(); window.scrollTo(0, 0); };
