@@ -1,7 +1,9 @@
 /* Rootline "Hidden Weight" track: words whose origin carries more weight than people realise.
    Cards come only from the word bank Worker; the lexicon itself is not published.
    Per word: dig its root (pick the origin), pick a swap that keeps the meaning, then the reveal with sources.
-   Swap picks are tallied on this device only (Phase 2 may upload them). Vanilla JS. */
+   Swap picks are tallied on this device and also sent, anonymously, to the word bank (POST /v1/lexicon/pick) so
+   Similarize can rank swaps by what players think keeps the meaning (Ben approved 2026-10-26). Fire-and-forget: a
+   failed upload is silent and never blocks play. `?bank=off` stops it for the tab. Vanilla JS. */
 (function(){
 "use strict";
 var KEY="rootline.hw", H=null, PER=5;
@@ -26,6 +28,21 @@ function reveal(c, pick){
   if(c.entry && !pick) return Promise.resolve(c);
   return getJSON(api()+"/v1/lexicon/reveal?id="+encodeURIComponent(c.id)+"&t="+encodeURIComponent(c.token)+(pick?"&pick="+encodeURIComponent(pick):""))
     .then(function(j){ c.entry=j.entry; c.decoy=j.decoy; return c; });
+}
+/* anonymous pick upload: a random per-device id (never sent raw anywhere else; the Worker stores only a salted hash) */
+var SID_KEY="rootline.hw.sid";
+function sid(){
+  try{ var v=localStorage.getItem(SID_KEY); if(v && /^[A-Za-z0-9_-]{8,64}$/.test(v)) return v;
+    var b=new Uint8Array(16); crypto.getRandomValues(b); v="h"+Array.prototype.map.call(b,function(x){ return ("0"+x.toString(16)).slice(-2); }).join("");
+    localStorage.setItem(SID_KEY, v); return v; }catch(e){ return null; }
+}
+function picksOff(){ try{ return !!sessionStorage.getItem("rootline.bank.off"); }catch(e){ return false; } }
+function sendPick(c, chosen){
+  try{
+    var a=api(), s=sid(); if(!a || !s || picksOff() || !c.token) return;
+    fetch(a+"/v1/lexicon/pick",{method:"POST",headers:{"Content-Type":"application/json"},keepalive:true,cache:"no-store",
+      body:JSON.stringify({id:c.id, t:c.token, chosen_swap:chosen, shown_swaps:c.swap_options, session:s})}).catch(function(){});
+  }catch(e){}
 }
 function start(){
   var app=document.getElementById("app");
@@ -55,7 +72,7 @@ function render(){
        (hs.rounds?'<p class="small" style="margin:10px 0 0;color:var(--gold2)">Rounds played: '+hs.rounds+' · best '+hs.best+' pts</p>':'')+'</div>';
   } else if(H.stage==="done"){
     h+='<div class="wordcard"><div class="tag">Round complete</div><div class="w" style="font-size:clamp(40px,10vw,64px)">'+H.score+' pts</div><div class="d">'+H.hits+' of '+(PER*2)+' right</div></div><div class="sep"></div>';
-    h+='<div class="card"><p class="muted small" style="margin-top:0">Your swap picks are saved on this device. This word list also helps <a href="https://similarize.com" target="_blank" rel="noopener" style="color:var(--gold)">Similarize</a> explain why a word may land harder than intended.</p>'+
+    h+='<div class="card"><p class="muted small" style="margin-top:0">Your swap picks help Similarize choose kinder words: they are sent anonymously (no name, no account). This word list also helps <a href="https://similarize.com" target="_blank" rel="noopener" style="color:var(--gold)">Similarize</a> explain why a word may land harder than intended.</p>'+
        '<button class="btn primary" data-act="hw-start">Another round →</button><div class="sep"></div><button class="btn" data-act="home">Home</button></div>';
   } else {
     h+='<div class="progress">'+H.words.map(function(_,k){ return '<i class="'+(k<H.i||(k===H.i&&H.stage==="reveal")?"on":"")+'"></i>'; }).join("")+'</div>';
@@ -67,7 +84,8 @@ function render(){
         h+='<div class="feedback '+(ok?"good":"bad")+'"><b>'+(ok?"Struck it! +10":"Not quite.")+'</b><br>'+esc(e.entry.origin)+'</div><div class="sep"></div><button class="btn primary" data-act="hw-toswap">Next: pick a swap →</button>'; }
     } else if(H.stage==="swap"){
       H.opts=e.swap_options.map(function(t){ return {t:t}; });
-      h+='<p class="q">Pick a swap for <em>'+esc(e.word)+'</em> that keeps the meaning without the baggage.</p><div class="opts">'+H.opts.map(function(o,i){ return optBtn(o,i,"hw-swap"); }).join("")+'</div>';
+      h+='<p class="q">Pick a swap for <em>'+esc(e.word)+'</em> that keeps the meaning without the baggage.</p><div class="opts">'+H.opts.map(function(o,i){ return optBtn(o,i,"hw-swap"); }).join("")+'</div>'+
+         '<p class="muted small hw-helps" style="margin:8px 0 0">🤝 Your picks help <a href="https://similarize.com" target="_blank" rel="noopener" style="color:var(--gold)">Similarize</a> choose kinder words.</p>';
       if(H.picked>=0 && e.entry){ var o=H.opts[H.picked], sok=okOf(e,"hw-swap",o.t), E=e.entry;
         h+='<div class="feedback '+(sok?"good":"bad")+'"><b>'+(sok?"Good swap! +10":"That one carries its own weight.")+'</b><br>'+
           (sok?(o.t===E.neutral_swap?"That's the top-ranked swap.":"Top-ranked swap: "+esc(E.neutral_swap)+"."):(e.decoy?esc(e.decoy.word)+": "+esc(e.decoy.why_it_lands)+" ":"")+"Try: "+esc(E.neutral_swap)+".")+
@@ -98,7 +116,7 @@ document.addEventListener("click",function(ev){
     reveal(c, a==="hw-swap" && c.entry && c.entry.alternatives.indexOf(t)<0 ? t : null).then(function(){
       H.busy=false; H.picked=i; var ok=okOf(c,a,t);
       if(ok){ H.score+=10; H.hits++; U().buzz(25); } else U().buzz([40,60,40]);
-      if(a==="hw-swap"){ hs.picks[c.id]=hs.picks[c.id]||{}; hs.picks[c.id][t]=(hs.picks[c.id][t]||0)+1; save(); }
+      if(a==="hw-swap"){ hs.picks[c.id]=hs.picks[c.id]||{}; hs.picks[c.id][t]=(hs.picks[c.id][t]||0)+1; save(); sendPick(c, t); }
       render(); var b=document.querySelector('.opt[data-i="'+i+'"]'); if(b){ if(ok) U().dust(b); else b.classList.add("shake"); }
       var fb=document.querySelector(".feedback"); if(fb && fb.getBoundingClientRect().bottom>innerHeight) fb.scrollIntoView({behavior:"smooth",block:"center"});
     }).catch(function(){ H.busy=false; U().toast("Hidden Weight is offline. Try again soon."); });
