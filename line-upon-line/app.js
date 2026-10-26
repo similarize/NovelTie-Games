@@ -545,9 +545,10 @@
   }
   function cbBar(show) {
     var el = document.getElementById("cbbar");
+    document.documentElement.classList.toggle("cbbar-on", !!show); /* push the page down so ← home and the pill stay tappable */
     if (!show) { if (el) el.style.display = "none"; return; }
     if (!el) { el = document.createElement("div"); el.id = "cbbar"; el.className = "cbbar"; document.body.appendChild(el);
-      el.onclick = function (e) { if (e.target.getAttribute("data-x") === "retry") { el.style.display = "none"; cflush(true); } else if (e.target.getAttribute("data-x") === "close") { el.style.display = "none"; } }; }
+      el.onclick = function (e) { if (e.target.getAttribute("data-x") === "retry") { el.style.display = "none"; cflush(true); } else if (e.target.getAttribute("data-x") === "close") { cbBar(false); } }; }
     var n = CQ.length;
     el.innerHTML = '<span>' + (n === 1 ? "1 tap not saved" : n + " taps not saved") + '</span><button class="btn primary" data-x="retry">Retry</button><button class="iconbtn" data-x="close" aria-label="Close">×</button>';
     el.style.display = "flex";
@@ -589,7 +590,9 @@
     tsPassP.then(function () { tsPassP = null; }, function (e) { tsPassP = null; if (!e || !e.quiet) tsFailed = true; });
     return tsPassP;
   }
-  function csend(path, body, fresh) { return getPass(fresh, true).then(function (pass) { var b = {}; for (var k in body) b[k] = body[k]; if (pass) b.pass = pass; return cpost(path, b); }); }
+  function csend(path, body, fresh) {
+    /* a tap during warm-up shares the warm-up check; if that stood down because Cloudflare wants a tap, run it again for this tap so the sheet opens */
+    return getPass(fresh, true).catch(function (e) { return e && e.quiet ? getPass(false, true) : Promise.reject(e); }).then(function (pass) { var b = {}; for (var k in body) b[k] = body[k]; if (pass) b.pass = pass; return cpost(path, b); }); }
   function cpostH(path, body) {
     return csend(path, body, false).then(function (j) { return j.status === 401 && j.turnstile ? csend(path, body, true) : j; })
       .then(function (j) {
