@@ -13,44 +13,57 @@ function esc(s){ return U().esc(s); }
 function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
 var CAT={gendered:"Gender",ethnic:"Ethnicity & origin",disability:"Disability & health",religious:"Religion",violent:"Violent imagery",political:"Politics",drift:"Meaning drift"};
 var HEAT=["Mostly harmless","Mild","Loaded","Slur"];
+/* Source: the word bank Worker (ROOTLINE_BANK_CONFIG.api) serves cards without answers (GET /v1/lexicon/round) and the
+   full entry per card with its signed token (GET /v1/lexicon/reveal). If the Worker can't be reached or doesn't have the
+   lexicon yet, fall back to the public lexicon.json and build the same cards locally. */
+function api(){ var c=window.ROOTLINE_BANK_CONFIG; return c && c.api ? c.api.replace(/\/$/,"") : null; }
+function getJSON(u){ return fetch(u,{cache:"no-store"}).then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); }); }
 function load(){
   if(LEX) return Promise.resolve(LEX);
-  return fetch("lexicon.json",{cache:"no-cache"}).then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
-    .then(function(j){ LEX=(j.entries||[]).filter(function(e){ return e.status==="reviewed" && e.origin; }); return LEX; });
+  return getJSON("lexicon.json").then(function(j){ LEX=(j.entries||[]).filter(function(e){ return e.status==="reviewed" && e.origin; }); return LEX; });
 }
-function pickWords(){
+function localCards(){
   var fresh=LEX.filter(function(e){ return !hs.seen[e.id]; });
   if(fresh.length<PER){ hs.seen={}; fresh=LEX.slice(); }
-  return shuffle(fresh).slice(0,PER);
+  return shuffle(fresh).slice(0,PER).map(function(e){
+    var others=shuffle(LEX.filter(function(x){ return x.id!==e.id && x.origin!==e.origin; })).slice(0,3).map(function(x){ return x.origin; });
+    var pool=LEX.filter(function(x){ return x.id!==e.id && x.heat>=2 && e.alternatives.indexOf(x.word)<0; });
+    var same=pool.filter(function(x){ return x.category===e.category; });
+    var dec=shuffle(same.length?same:pool)[0];
+    return {id:e.id, word:e.word, category:e.category, root_options:shuffle([e.origin].concat(others)),
+      swap_options:shuffle(e.alternatives.slice(0,3).concat(dec?[dec.word]:[])), entry:e, local:true};
+  });
 }
-function rootOpts(e){
-  var others=shuffle(LEX.filter(function(x){ return x.id!==e.id && x.origin!==e.origin; })).slice(0,3);
-  return shuffle([{t:e.origin,ok:true}].concat(others.map(function(x){ return {t:x.origin,ok:false,w:x.word}; })));
+function serverCards(){
+  var a=api(); if(!a) return Promise.reject(new Error("no api"));
+  return getJSON(a+"/v1/lexicon/round?n="+PER).then(function(j){ if(!j.cards||!j.cards.length) throw new Error("empty"); return j.cards; });
 }
-function swapOpts(e){
-  var alts=e.alternatives.slice(0,3).map(function(a){ return {t:a,ok:true}; });
-  var pool=LEX.filter(function(x){ return x.id!==e.id && x.heat>=2 && e.alternatives.indexOf(x.word)<0; });
-  var same=pool.filter(function(x){ return x.category===e.category; });
-  var dec=shuffle(same.length?same:pool)[0];
-  if(dec) alts.push({t:dec.word,ok:false,decoy:dec});
-  return shuffle(alts);
+function reveal(c, pick){
+  if(c.local){
+    if(pick && c.entry.alternatives.indexOf(pick)<0){ var d=LEX.filter(function(x){ return x.word===pick; })[0]; c.decoy=d?{word:d.word,why_it_lands:d.why_it_lands}:null; }
+    return Promise.resolve(c);
+  }
+  if(c.entry && !pick) return Promise.resolve(c);
+  return getJSON(api()+"/v1/lexicon/reveal?id="+encodeURIComponent(c.id)+"&t="+encodeURIComponent(c.token)+(pick?"&pick="+encodeURIComponent(pick):""))
+    .then(function(j){ c.entry=j.entry; c.decoy=j.decoy; return c; });
 }
 function start(){
   var app=document.getElementById("app");
   app.innerHTML=U().topbar("Hidden Weight")+'<div class="card"><p class="muted" style="margin:0">Loading words…</p></div>';
-  load().then(function(){
-    if(!LEX.length) throw new Error("empty");
-    H={words:pickWords(), i:0, stage:"intro", score:0, hits:0, opts:null, picked:-1};
-    render();
-  }).catch(function(){
-    app.innerHTML=U().topbar("Hidden Weight")+'<div class="card"><h3>Words unavailable</h3><p class="muted">Couldn\'t load the word list. Connect once to download it; after that it works offline.</p><button class="btn primary" data-act="hw-start">Try again</button></div>';
-  });
+  serverCards().then(function(cards){ return {cards:cards, src:"server"}; })
+    .catch(function(){ return load().then(function(){ if(!LEX.length) throw new Error("empty"); return {cards:localCards(), src:"local"}; }); })
+    .then(function(r){ H={words:r.cards, src:r.src, i:0, stage:"intro", score:0, hits:0, picked:-1, busy:false}; PER=r.cards.length; render(); })
+    .catch(function(){
+      app.innerHTML=U().topbar("Hidden Weight")+'<div class="card"><h3>Words unavailable</h3><p class="muted">Couldn\'t load the word list. Connect once to download it; after that it works offline.</p><button class="btn primary" data-act="hw-start">Try again</button></div>';
+    });
 }
 function srcLinks(e){
   return '<div class="rs-src">Sources: '+e.sources.map(function(s){ return '<a href="'+esc(s.url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--gold)">'+esc(s.title)+'</a>'; }).join(" · ")+'</div>';
 }
+function okOf(c, act, t){ return act==="hw-root" ? t===c.entry.origin : c.entry.alternatives.indexOf(t)>=0; }
 function optBtn(o,i,act,label){
-  var cls=""; if(H.picked>=0){ if(o.ok && (act==="hw-root"||i===H.picked)) cls=" right"; else if(i===H.picked) cls=" wrong"; }
+  var c=H.words[H.i], cls="";
+  if(H.picked>=0 && c.entry){ var ok=okOf(c,act,o.t); if(ok && (act==="hw-root"||i===H.picked)) cls=" right"; else if(i===H.picked) cls=" wrong"; }
   return '<button class="opt'+cls+'" data-act="'+act+'" data-i="'+i+'"'+(H.picked>=0?" disabled":"")+'>'+(label?'<span class="ol">'+label+'</span>':'')+'<span class="of" style="font-size:18px">'+esc(o.t)+'</span></button>';
 }
 function render(){
@@ -68,18 +81,19 @@ function render(){
     h+='<div class="progress">'+H.words.map(function(_,k){ return '<i class="'+(k<H.i||(k===H.i&&H.stage==="reveal")?"on":"")+'"></i>'; }).join("")+'</div>';
     h+='<div class="wordcard" style="padding:18px"><div class="tag">'+esc(CAT[e.category]||e.category)+' · word '+(H.i+1)+' of '+PER+'</div><div class="w" style="font-size:clamp(36px,10vw,62px)">'+esc(e.word)+'</div></div><div class="sep"></div>';
     if(H.stage==="root"){
-      if(!H.opts) H.opts=rootOpts(e);
+      H.opts=e.root_options.map(function(t){ return {t:t}; });
       h+='<p class="q">Dig up the root: where does <em>'+esc(e.word)+'</em> come from?</p><div class="opts">'+H.opts.map(function(o,i){ return optBtn(o,i,"hw-root"); }).join("")+'</div>';
-      if(H.picked>=0){ var ok=H.opts[H.picked].ok;
-        h+='<div class="feedback '+(ok?"good":"bad")+'"><b>'+(ok?"Struck it! +10":"Not quite.")+'</b><br>'+esc(e.origin)+'</div><div class="sep"></div><button class="btn primary" data-act="hw-toswap">Next: pick a swap →</button>'; }
+      if(H.picked>=0 && e.entry){ var ok=okOf(e,"hw-root",H.opts[H.picked].t);
+        h+='<div class="feedback '+(ok?"good":"bad")+'"><b>'+(ok?"Struck it! +10":"Not quite.")+'</b><br>'+esc(e.entry.origin)+'</div><div class="sep"></div><button class="btn primary" data-act="hw-toswap">Next: pick a swap →</button>'; }
     } else if(H.stage==="swap"){
-      if(!H.opts) H.opts=swapOpts(e);
+      H.opts=e.swap_options.map(function(t){ return {t:t}; });
       h+='<p class="q">Pick a swap for <em>'+esc(e.word)+'</em> that keeps the meaning without the baggage.</p><div class="opts">'+H.opts.map(function(o,i){ return optBtn(o,i,"hw-swap"); }).join("")+'</div>';
-      if(H.picked>=0){ var o=H.opts[H.picked];
-        h+='<div class="feedback '+(o.ok?"good":"bad")+'"><b>'+(o.ok?"Good swap! +10":"That one carries its own weight.")+'</b><br>'+
-          (o.ok?(o.t===e.neutral_swap?"That's the top-ranked swap.":"Top-ranked swap: "+esc(e.neutral_swap)+"."):esc(o.decoy.word)+": "+esc(o.decoy.why_it_lands)+" Try: "+esc(e.neutral_swap)+".")+
+      if(H.picked>=0 && e.entry){ var o=H.opts[H.picked], sok=okOf(e,"hw-swap",o.t), E=e.entry;
+        h+='<div class="feedback '+(sok?"good":"bad")+'"><b>'+(sok?"Good swap! +10":"That one carries its own weight.")+'</b><br>'+
+          (sok?(o.t===E.neutral_swap?"That's the top-ranked swap.":"Top-ranked swap: "+esc(E.neutral_swap)+"."):(e.decoy?esc(e.decoy.word)+": "+esc(e.decoy.why_it_lands)+" ":"")+"Try: "+esc(E.neutral_swap)+".")+
           '</div><div class="sep"></div><button class="btn primary" data-act="hw-reveal">See why →</button>'; }
     } else if(H.stage==="reveal"){
+      var c0=e; e=e.entry;
       h+='<div class="card"><h3>Why “'+esc(e.word)+'” lands</h3><p style="margin-top:0">'+esc(e.why_it_lands)+'</p>'+
         '<p class="muted small" style="margin:6px 0"><b style="color:var(--gold2)">Root:</b> '+esc(e.origin)+'</p>'+
         '<p class="muted small" style="margin:6px 0"><b style="color:var(--gold2)">Weight:</b> '+HEAT[e.heat]+' · <b style="color:var(--gold2)">Swaps:</b> '+e.alternatives.map(esc).join(", ")+'</p>'+
@@ -100,11 +114,14 @@ document.addEventListener("click",function(ev){
   if(!H) return;
   if(a==="hw-go"){ H.stage="root"; H.opts=null; H.picked=-1; render(); }
   else if(a==="hw-root"||a==="hw-swap"){
-    if(H.picked>=0) return; var i=+el.dataset.i, o=H.opts[i]; H.picked=i;
-    if(o.ok){ H.score+=10; H.hits++; U().buzz(25); } else U().buzz([40,60,40]);
-    if(a==="hw-swap"){ var id=H.words[H.i].id; hs.picks[id]=hs.picks[id]||{}; hs.picks[id][o.t]=(hs.picks[id][o.t]||0)+1; save(); }
-    render(); var b=document.querySelector('.opt[data-i="'+i+'"]'); if(b){ if(o.ok) U().dust(b); else b.classList.add("shake"); }
-    var fb=document.querySelector(".feedback"); if(fb && fb.getBoundingClientRect().bottom>innerHeight) fb.scrollIntoView({behavior:"smooth",block:"center"});
+    if(H.picked>=0||H.busy) return; var i=+el.dataset.i, c=H.words[H.i], t=H.opts[i].t; H.busy=true;
+    reveal(c, a==="hw-swap" && c.entry && c.entry.alternatives.indexOf(t)<0 ? t : null).then(function(){
+      H.busy=false; H.picked=i; var ok=okOf(c,a,t);
+      if(ok){ H.score+=10; H.hits++; U().buzz(25); } else U().buzz([40,60,40]);
+      if(a==="hw-swap"){ hs.picks[c.id]=hs.picks[c.id]||{}; hs.picks[c.id][t]=(hs.picks[c.id][t]||0)+1; save(); }
+      render(); var b=document.querySelector('.opt[data-i="'+i+'"]'); if(b){ if(ok) U().dust(b); else b.classList.add("shake"); }
+      var fb=document.querySelector(".feedback"); if(fb && fb.getBoundingClientRect().bottom>innerHeight) fb.scrollIntoView({behavior:"smooth",block:"center"});
+    }).catch(function(){ H.busy=false; U().toast("Couldn't check that one. Try again."); });
   }
   else if(a==="hw-toswap"){ H.stage="swap"; H.opts=null; H.picked=-1; render(); }
   else if(a==="hw-reveal"){ H.stage="reveal"; hs.seen[H.words[H.i].id]=1; save(); render(); window.scrollTo(0,0); }
