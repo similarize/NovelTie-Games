@@ -554,7 +554,7 @@
     var ctx = stage === 2 ? '<h3 style="margin-top:18px">Where has this shown up in your life?</h3><div class="cbctx">' + CB.contexts.map(function (x) { return '<button class="chip' + (CB.ctx === x.id ? " on" : "") + '" data-act="cbctx" data-arg="' + esc(x.id) + '">' + esc(x.label) + "</button>"; }).join("") + "</div>" : "";
     app.innerHTML = topbar("Bridges", '<span class="pill">' + (CB.k + 1) + " of " + CB.cards.length + "</span>") +
       '<div class="card stack"><div class="small muted">' + esc(c.ref) + '</div><div class="verse">' + verses + '</div><a class="small" href="' + esc(c.source.url) + '" target="_blank" rel="noopener">' + esc(c.source.name) + " ↗</a></div>" +
-      '<h3 style="margin-top:18px">Which helps you understand this best?</h3><p class="small muted" style="margin:-4px 0 10px">' + esc(c.framings_label || "Members' insights") + ", not Church doctrine.</p>" +
+      '<h3 style="margin-top:18px">Which helps you understand this best?</h3><p class="small muted" style="margin:-4px 0 10px">' + "Ways people explain it · not Church doctrine.</p>" +
       '<div class="opts">' + fr + "</div>" + ctx +
       '<div class="stack" style="margin-top:16px"><button class="btn' + (stage === 2 ? " primary" : " ghost") + '" data-act="cbnext">' + (stage === 2 ? "Next passage →" : "Skip this one") + "</button></div>";
   }
