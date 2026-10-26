@@ -144,5 +144,5 @@ input[type=text]{width:100%;min-height:56px;border-radius:14px;border:1px solid 
 /* Bridges: Turnstile sheet (only when Cloudflare needs a tap; dims the page so it never sits on an answer) and the "not saved yet" bar */
 .cbts{display:none;position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.45);align-items:center;justify-content:center;padding:16px}
 .cbts-card{background:var(--card,#fffaf0);color:var(--ink);border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.3);max-width:340px;text-align:center}
-.cbbar{display:none;position:fixed;left:0;right:0;top:0;z-index:15;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;background:var(--ink);color:#fffaf0;font-size:15px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
-.cbbar .btn{width:auto;padding:8px 16px;margin:0}.cbbar .iconbtn{color:#fffaf0;background:transparent;border:0;font-size:20px}
+.cbbar{display:none;position:fixed;left:0;right:0;top:0;z-index:15;gap:8px;align-items:center;justify-content:center;flex-wrap:nowrap;white-space:nowrap;padding:calc(6px + env(safe-area-inset-top)) 8px 6px;background:var(--ink);color:#fffaf0;font-size:14px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.cbbar span{overflow:hidden;text-overflow:ellipsis}.cbbar .btn{width:auto;min-height:0;padding:6px 14px;margin:0;font-size:14px}.cbbar .iconbtn{min-width:32px;height:32px;padding:0;color:#fffaf0;background:transparent;border:0;font-size:20px}
