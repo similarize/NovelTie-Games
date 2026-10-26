@@ -1,6 +1,6 @@
 {
- "version": 1,
- "updated": "2026-10-26T05:16:55Z",
+ "version": 2,
+ "updated": "2026-10-26T07:48:23Z",
  "about": "Rootline 'Hidden Weight' lexicon: words whose origin carries more weight than people realise. Origins checked against the linked Wiktionary entries.",
  "entries": [
   {
@@ -56,7 +56,8 @@
    "neutral_swap": "woman",
    "alternatives": [
     "woman",
-    "person"
+    "person",
+    "young woman"
    ],
    "false_friends": [],
    "origin": "Middle English houswyf, 'housewife', worn down by sound change",
@@ -351,7 +352,8 @@
    "neutral_swap": "police van",
    "alternatives": [
     "police van",
-    "patrol wagon"
+    "patrol wagon",
+    "police wagon"
    ],
    "false_friends": [],
    "origin": "Supposedly from 'Paddy', a derogatory name for an Irishman",
@@ -1255,8 +1257,8 @@
    "category": "religious",
    "neutral_swap": "nonbeliever",
    "alternatives": [
-    "nonreligious",
     "nonbeliever",
+    "nonreligious",
     "outsider"
    ],
    "false_friends": [],
@@ -1627,7 +1629,7 @@
    ],
    "heat": 1,
    "category": "political",
-   "neutral_swap": "redraw districts",
+   "neutral_swap": "redraw districts for advantage",
    "alternatives": [
     "redraw districts for advantage",
     "redistrict unfairly",
@@ -1657,7 +1659,8 @@
    "neutral_swap": "collaborator",
    "alternatives": [
     "collaborator",
-    "defector"
+    "defector",
+    "informer"
    ],
    "false_friends": [],
    "origin": "After Vidkun Quisling, head of Norway's Nazi-collaborationist government",
@@ -1711,7 +1714,8 @@
    "neutral_swap": "populist",
    "alternatives": [
     "populist",
-    "crowd-pleaser"
+    "crowd-pleaser",
+    "firebrand"
    ],
    "false_friends": [],
    "origin": "Greek demagogos, 'leader of the people', from demos + agogos",
