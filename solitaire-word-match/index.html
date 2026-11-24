@@ -34,7 +34,7 @@
     <link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="assets/splash-1668x2224.png?v=5" />
     <link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="assets/splash-1668x2388.png?v=5" />
     <link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="assets/splash-2048x2732.png?v=5" />
-    <meta name="swm-build" content="20261122-fan" />
+    <meta name="swm-build" content="20261124-hint" />
     <title>Solitaire Word Match</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -574,6 +574,12 @@ body{background:linear-gradient(180deg,#067c34 0%,#0f9447 14%,#13a04d 40%,#14a04
 .featList div:nth-child(5n+5){border-left:6px solid #11a38a !important}
 .bigBtn.alt{background:linear-gradient(#ffffff,#e8f1ff) !important;color:#1d6fe0 !important;box-shadow:0 4px 0 #a9c6f0,0 6px 14px rgba(0,0,0,.18) !important}
 .sheet .closeX{background:#eef4ff !important;color:#1d6fe0 !important}
+/* hint pass (Hark, 20261124-hint): Bill couldn't see the pale yellow hint glow on white cards and gold crowns.
+   Hot magenta ring + glow that stays visible even with reduced motion (outline is static, the pulse is extra). */
+.card.hintSrc,.card.hintDst,.fslot.hintDst{outline:4px solid #ff1f8f !important;outline-offset:2px;animation:hintPulse2 .6s ease-in-out infinite alternate !important;z-index:25}
+.card.hintDst,.fslot.hintDst{outline-style:dashed !important}
+@keyframes hintPulse2{from{box-shadow:0 0 0 2px #fff,0 0 10px 3px rgba(255,31,143,.55)}to{box-shadow:0 0 0 2px #fff,0 0 26px 9px rgba(255,31,143,.95)}}
+@media (prefers-reduced-motion: reduce){.card.hintSrc,.card.hintDst,.fslot.hintDst{animation:none !important;box-shadow:0 0 0 2px #fff,0 0 18px 6px rgba(255,31,143,.85) !important}}
 </style>
     <style>
       #splash{
@@ -2774,7 +2780,7 @@ body{background:linear-gradient(180deg,#067c34 0%,#0f9447 14%,#13a04d 40%,#14a04
   var btn = document.getElementById('installBtn');
   var deferred = null;
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js?v=20261122-fan', { scope: './' }).catch(function(){});
+    navigator.serviceWorker.register('sw.js?v=20261124-hint', { scope: './' }).catch(function(){});
   }
   window.addEventListener('beforeinstallprompt', function(e){
     e.preventDefault();
